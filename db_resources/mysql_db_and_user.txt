@@ -1,0 +1,5 @@
+Create a test user and database:	
+	Login to mysql CLI as a root user: mysql -u root -p
+	create database home_automation;
+	create user 'home_automation'@'localhost' identified by '<your_password_goes_here>';
+	grant all on home_automation.* to 'home_automation'@'localhost';
