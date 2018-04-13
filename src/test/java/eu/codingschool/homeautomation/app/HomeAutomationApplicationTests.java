@@ -1,4 +1,4 @@
-package eu.codingschool.homeautomation;
+package eu.codingschool.homeautomation.app;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,13 +1,10 @@
 package eu.codingschool.homeautomation.model;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -22,6 +19,10 @@ public class DeviceType {
 	@Column(name = "type")
 	private String type;
 	
+	/**
+	 * This is the kind of the information we will keep for a device type. 
+	 * For instance, for oven we keep 'temperature', for lighting the 'illumination percentage'.
+	 */
 	@Column(name = "information_type")
 	private String informationType;
 	
@@ -31,6 +32,11 @@ public class DeviceType {
 
 	public DeviceType() {
 		
+	}
+	
+	public DeviceType(String type, String informationType) {
+		this.type = type;
+		this.informationType = informationType;
 	}
 	
 	public int getId() {

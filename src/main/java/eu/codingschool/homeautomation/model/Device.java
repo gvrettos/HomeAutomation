@@ -24,25 +24,41 @@ public class Device {
 	@Column(name = "name")
 	private String name;
 
+	/**
+	 * This will be either ON or OFF.
+	 */
 	@Column(name = "status")
 	private String status;
 
+	/**
+	 * It keeps a value for the specific device related to the type of the device. 
+	 * For instance, for the oven we keep the temperature in Celsius degrees, for lighting we keep the percentage of the 
+	 * illumination, etc.
+	 */
 	@Column(name = "information_value")
 	private String informationValue;
-
-	@ManyToMany(mappedBy = "devices")
-	private Set<Person> persons;
-	
-	@ManyToOne
-	@JoinColumn(name = "room_id")
-	private Room room;
 	
 	@ManyToOne
 	@JoinColumn(name = "device_type_id")
 	private DeviceType deviceType;
 	
+	@ManyToOne
+	@JoinColumn(name = "room_id")
+	private Room room;
+	
+	@ManyToMany(mappedBy = "devices")
+	private Set<Person> persons;
+	
 	public Device() {
 		
+	}
+	
+	public Device(String name, String status, String informationValue, DeviceType deviceType, Room room) {
+		this.name = name;
+		this.status = status;
+		this.informationValue = informationValue;
+		this.room = room;
+		this.deviceType = deviceType;
 	}
 
 	public int getId() {
@@ -77,22 +93,6 @@ public class Device {
 		this.informationValue = informationValue;
 	}
 
-	public Set<Person> getPersons() {
-		return persons;
-	}
-
-	public void setPersons(Set<Person> persons) {
-		this.persons = persons;
-	}
-
-	public Room getRoom() {
-		return room;
-	}
-
-	public void setRoom(Room room) {
-		this.room = room;
-	}
-
 	public DeviceType getDeviceType() {
 		return deviceType;
 	}
@@ -101,4 +101,19 @@ public class Device {
 		this.deviceType = deviceType;
 	}
 	
+	public Room getRoom() {
+		return room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
+	}
+	
+	public Set<Person> getPersons() {
+		return persons;
+	}
+
+	public void setPersons(Set<Person> persons) {
+		this.persons = persons;
+	}
 }
