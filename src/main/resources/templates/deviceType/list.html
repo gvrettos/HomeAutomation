@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" 
+	xmlns:th="http://www.thymeleaf.org" 
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{index}">
+<head>
+<meta charset="UTF-8">
+<title>Device Types</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2 class="mb-5 mt-5">Device Types List</h2>
+
+		<div class="row custyle">
+			
+			<div id="modalHolder"></div>
+			
+			<p>
+				<a href="#" th:href="@{/deviceType/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
+					<b>+</b> Add new Device Type
+				</a>
+			</p>
+			
+			<table class="table table-striped custab">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Device Type</th>
+						<th>Information Type</th>
+						<th class="text-center">actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="deviceType : ${deviceTypes}">
+						<td th:text="${deviceType.getId()}">ID</td>
+						<td th:text="${deviceType.getType()}">Device Type</td>
+						<td th:text="${deviceType.getInformationType()}">Information Type</td>
+						<td class="text-center">
+							<a class="btn btn-info btn-xs btnEdit" href="#"
+							   th:href="@{/deviceType/{id}/edit(id=${deviceType.getId()})}">  
+							   <span class="fa fa-edit"></span> Edit
+							</a> 
+							<a class="btn btn-danger btn-xs btnDelete" href="#"
+							   th:href="@{/deviceType/{id}/delete(id=${deviceType.getId()})}"> 
+							   <span class="fa fa-remove"></span> Delete
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+</body>
+</html>

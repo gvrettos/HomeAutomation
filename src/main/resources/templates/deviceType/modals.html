@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Edit Device Type</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+	<!-- New or Edit modal -->
+	<div class="modal fade" id="modalNewOrEdit" tabindex="-1" role="dialog" th:fragment="modalNewOrEdit">
+		<div class="modal-dialog row" role="document">
+			<div class="modal-content">
+
+				<form th:action="@{${actionUrl}}" th:method="post" th:object="${deviceType}" id="formNewOrEdit"
+					  class="form-horizontal" role="form">
+					<fieldset>
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalNewOrEditLabel"><span th:text="${modalTitle}"></span> Device Type</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+
+						<div class="form-group">
+							<label for="type" class="col-form-label">Device Type:</label> 
+							<input type="text" class="form-control" th:field="*{type}" required />
+							<span th:if="${#fields.hasErrors('type')}" th:errors="*{type}">..</span>
+						</div>
+						<div class="form-group">
+							<label for="informationType" class="col-form-label">Information Type:</label> 
+							<input type="text" class="form-control" th:field="*{informationType}" />
+							<span th:if="${#fields.hasErrors('informationType')}" th:errors="*{informationType}">..</span>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal" id="modalBtnClose">Close</button>
+						<input type="submit" class="btn btn-primary" value="Save" id="modalBtnSave" />
+					</div>
+					</fieldset>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	
+	<!-- Delete confirmation modal -->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" th:fragment="modalDelete">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form th:action="@{${actionUrl}}" th:method="post" th:object="${deviceType}">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Device Type</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p class="alert alert-danger">
+							Are you sure you want to delete device type "<span id="deviceType" th:text="*{type}"></span>"?
+						</p>
+					</div>
+					<div class="modal-footer">
+						<input type="submit" id="modalBtnDoDelete" class="btn btn-danger" value="Yes, delete" />
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	
+</body>
+</html>

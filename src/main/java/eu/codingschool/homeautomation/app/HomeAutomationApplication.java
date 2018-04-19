@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EntityScan("eu.codingschool.homeautomation.model")
-@ComponentScan("eu.codingschool.homeautomation.services")
+@ComponentScan({"eu.codingschool.homeautomation.services", "eu.codingschool.homeautomation.controllers", 
+	"eu.codingschool.homeautomation.validators"})
 @EnableJpaRepositories("eu.codingschool.homeautomation.repositories")
 public class HomeAutomationApplication {
 

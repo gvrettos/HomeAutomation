@@ -25,6 +25,11 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 	}
 	
 	@Override
+	public List<DeviceType> findByType(String type) {
+		return deviceTypeRepository.findByType(type);
+	}
+	
+	@Override
 	public DeviceType save(DeviceType dt) {
 		return deviceTypeRepository.save(dt);
 	}

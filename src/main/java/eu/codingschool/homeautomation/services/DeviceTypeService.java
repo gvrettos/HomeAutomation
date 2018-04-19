@@ -8,6 +8,7 @@ public interface DeviceTypeService {
 	
 	List<DeviceType> findAll();
 	DeviceType findById(Integer id);
+	List<DeviceType> findByType(String type);
     
 	DeviceType save(DeviceType dt);
     
