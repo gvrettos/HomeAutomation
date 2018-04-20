@@ -15,7 +15,9 @@ import eu.codingschool.homeautomation.model.Person;
 public interface DeviceRepository extends JpaRepository<Device, Integer> {
 	
 	List<Device> findByName(String name);
-	List<Device> findByStatus(String surname);
+	
+	@Query("select d from Device d where d.statusOn = :statusOn")
+	List<Device> findByStatus(@Param("statusOn") boolean statusOn);
     
     @Query("select d.persons from Device d where d.id = :id")
     Set<Person> findUsersAssigned(@Param("id") Integer id);

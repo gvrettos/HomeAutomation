@@ -32,8 +32,8 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public List<Device> findByStatus(String status) {
-		return deviceRepository.findByStatus(status);
+	public List<Device> findByStatus(boolean statusOn) {
+		return deviceRepository.findByStatus(statusOn);
 	}
 
 	@Override

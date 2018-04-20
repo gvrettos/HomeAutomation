@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" 
+	xmlns:th="http://www.thymeleaf.org" 
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{index}">
+<head>
+<meta charset="UTF-8">
+<title>Devices</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2 class="mb-5 mt-5">Devices List</h2>
+
+		<div class="row custyle">
+			
+			<div id="modalHolder"></div>
+			
+			<p>
+				<a href="#" th:href="@{/device/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
+					<b>+</b> Add new Device
+				</a>
+			</p>
+			
+			<table class="table table-striped custab">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Name</th>
+						<th>Status</th>
+						<th>Device Type</th>
+						<th>Information Type</th>
+						<th>Information Value</th>
+						<th>Room ID</th>
+						<th class="text-center">actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="device : ${devices}">
+						<td th:text="${device.getId()}">ID</td>
+						<td th:text="${device.getName()}">Name</td>
+						<td th:text="${device.isStatusOn() ? 'ON' : 'OFF'}">Status</td>
+						<td th:text="${device.getDeviceType().getType()}">Device Type</td>
+						<td th:text="${device.getDeviceType().getInformationType()}">Information Type</td>
+						<td th:text="${device.getInformationValue() != null ? device.getInformationValue() : '-'}">Information Value</td>
+						<td th:text="${device.getRoom().getName()}">Room</td>
+						<td class="text-center">
+							<a class="btn btn-info btn-xs btnEdit" href="#"
+							   th:href="@{/device/{id}/edit(id=${device.getId()})}">  
+							   <span class="fa fa-edit"></span> Edit
+							</a> 
+							<a class="btn btn-danger btn-xs btnDelete" href="#"
+							   th:href="@{/device/{id}/delete(id=${device.getId()})}"> 
+							   <span class="fa fa-remove"></span> Delete
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+</body>
+</html>

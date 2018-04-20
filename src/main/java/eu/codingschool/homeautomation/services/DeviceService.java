@@ -11,7 +11,7 @@ public interface DeviceService {
 	List<Device> findAll();
 	Device findById(Integer id);
 	List<Device> findByName(String name);
-	List<Device> findByStatus(String status);
+	List<Device> findByStatus(boolean statusOn);
     Set<Person> findUsersAssigned(Integer id);
     
     Device save(Device d);
