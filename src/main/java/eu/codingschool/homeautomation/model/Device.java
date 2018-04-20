@@ -12,6 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+
 @Entity
 @Table(name = "DEVICE")
 public class Device {
@@ -28,7 +30,8 @@ public class Device {
 	 * This will be either ON or OFF.
 	 */
 	@Column(name = "status")
-	private String status;
+	@Type(type="numeric_boolean")
+	private boolean statusOn;
 
 	/**
 	 * It keeps a value for the specific device related to the type of the device. 
@@ -53,9 +56,9 @@ public class Device {
 		
 	}
 	
-	public Device(String name, String status, String informationValue, DeviceType deviceType, Room room) {
+	public Device(String name, boolean statusOn, String informationValue, DeviceType deviceType, Room room) {
 		this.name = name;
-		this.status = status;
+		this.statusOn = statusOn;
 		this.informationValue = informationValue;
 		this.room = room;
 		this.deviceType = deviceType;
@@ -77,12 +80,12 @@ public class Device {
 		this.name = name;
 	}
 
-	public String getStatus() {
-		return status;
+	public boolean isStatusOn() {
+		return statusOn;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatusOn(boolean statusOn) {
+		this.statusOn = statusOn;
 	}
 
 	public String getInformationValue() {

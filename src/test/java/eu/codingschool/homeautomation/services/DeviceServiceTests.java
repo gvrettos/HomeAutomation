@@ -61,14 +61,14 @@ public class DeviceServiceTests {
 	
 	@Test
 	public void testSaveDevice1() {
-		Device device = new Device("Air Condition #1", "ON", "20", getRandomDeviceType(), getRandomRoom());
+		Device device = new Device("Air Condition #1", true, "20", getRandomDeviceType(), getRandomRoom());
 		Device deviceSaved = deviceService.save(device);
 		assertNotNull("Device1 was not saved", deviceSaved);
 	}
 	
 	@Test
 	public void testSaveDevice2() {
-		Device device = new Device("Lighting #1", "ON", "50", getRandomDeviceType(), getRandomRoom());
+		Device device = new Device("Lighting #1", true, "50", getRandomDeviceType(), getRandomRoom());
 		Device deviceSaved = deviceService.save(device);
 		assertNotNull("Device2 was not saved", deviceSaved);
 	}
@@ -114,8 +114,8 @@ public class DeviceServiceTests {
 	public void testFindByStatus() {
 		List<Device> devices = deviceService.findAll();
 		if (!devices.isEmpty()) {
-			String status = devices.get(0).getStatus();
-			List<Device> devicesFoundByCriteria = deviceService.findByStatus(status);
+			boolean statusOn = devices.get(0).isStatusOn();
+			List<Device> devicesFoundByCriteria = deviceService.findByStatus(statusOn);
 			assertNotNull("Requested device does not exist", devicesFoundByCriteria);
 			assertFalse("Requested device does not exist", devicesFoundByCriteria.isEmpty());
 		}

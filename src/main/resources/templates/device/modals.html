@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Edit Device Type</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+	<!-- New or Edit modal -->
+	<div class="modal fade" id="modalNewOrEdit" tabindex="-1" role="dialog" th:fragment="modalNewOrEdit">
+		<div class="modal-dialog row" role="document">
+			<div class="modal-content">
+
+				<form th:action="@{${actionUrl}}" th:method="post" th:object="${device}" id="formNewOrEdit"
+					  class="form-horizontal" role="form">
+					<fieldset>
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalNewOrEditLabel"><span th:text="${modalTitle}"></span> Device</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+
+						<div class="form-group">
+							<label for="name" class="col-form-label">Name:</label> 
+							<input type="text" class="form-control" th:field="*{name}" required />
+							<span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">..</span>
+						</div>
+						
+						<!-- <div class="form-group">
+							<label for="status" class="col-form-label">Status:</label> 
+							<select class="custom-select" id="inputGroupSelectStatus">
+							    <option value="0" th:selected="${device.status == null || device.status == 'OFF'}">OFF</option>
+							    <option value="1" th:selected="${device.status == 'ON'}">ON</option>
+							</select>
+							<span th:if="${#fields.hasErrors('status')}" th:errors="*{status}">..</span>
+						</div> -->
+						
+						<div class="form-group">
+							<label for="deviceType.type" class="col-form-label">Device Type:</label> 
+							
+							<select class="custom-select" id="inputGroupSelectDeviceType" th:field="*{deviceType}" required><!-- th:selected="${deviceType.id == device.deviceType.id}" -->
+							    <option value="">Choose...</option>
+							    <option th:each="deviceType : ${allDeviceTypes}" 
+						           		th:value="${deviceType.id}" th:text="${deviceType.type}"
+						           		
+						           		>Choose...
+						        </option>
+							</select>
+							<span th:if="${#fields.hasErrors('deviceType.type')}" th:errors="*{deviceType.type}">..</span>
+						</div>
+						
+						<!-- <div class="form-group">
+							<label for="informationVype" class="col-form-label"><span th:text="*{deviceType.informationType}">:</span></label> 
+							<input type="text" class="form-control" th:field="*{informationValue}" />
+							<span th:if="${#fields.hasErrors('informationValue')}" th:errors="*{informationValue}">..</span>
+						</div> -->
+						
+						<div class="form-group">
+							<label for="device.room.id" class="col-form-label">Assign to room:</label> 
+							<select class="custom-select" id="inputGroupSelectRoom" th:field="*{room}" required><!-- th:selected="${room.id == device.room.id}" -->
+								<option value="">Choose...</option>
+							    <option th:each="room : ${allRooms}" 
+						           		th:value="${room.id}" th:text="${room.name}"
+						           		th:selected="${device.room != null && room.id == device.room.id}"
+						           		>Choose...
+						        </option>
+							</select>
+							<span th:if="${#fields.hasErrors('room.id')}" th:errors="*{room.id}">..</span>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal" id="modalBtnClose">Close</button>
+						<input type="submit" class="btn btn-primary" value="Save" id="modalBtnSave" />
+					</div>
+					</fieldset>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	
+	<!-- Delete confirmation modal -->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" th:fragment="modalDelete">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form th:action="@{${actionUrl}}" th:method="post" th:object="${device}">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Device</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p class="alert alert-danger">
+							Are you sure you want to delete device "<span id="device" th:text="*{name}"></span>"?
+						</p>
+					</div>
+					<div class="modal-footer">
+						<input type="submit" id="modalBtnDoDelete" class="btn btn-danger" value="Yes, delete" />
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	
+</body>
+</html>
