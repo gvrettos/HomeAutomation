@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" 
+	xmlns:th="http://www.thymeleaf.org" 
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{index}">
+<head>
+<meta charset="UTF-8">
+<title>Devices</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2 class="mb-5 mt-5">Rooms List</h2>
+
+		<div class="row col-md-offset-1 custyle">
+			
+			<div id="modalHolder"></div>
+			
+			<p>
+				<a href="#" th:href="@{/device/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
+					<b>+</b> Add new Room
+				</a>
+			</p>
+			
+			<table class="table table-striped custab">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Room</th>
+						<th class="text-center">actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="room, i : ${room}">
+					<td th:text="${i.count}"></td>
+						<!-- <td th:text="${room.getId()}">ID</td> -->
+						<td th:text="${room.getName()}">Name of the Room</td>
+						
+						<td class="text-center">
+							<a class="btn btn-info btn-xs btnEdit" href="#"
+							   th:href="@{/room/{id}/edit(id=${room.getId()})}">  
+							   <span class="fa fa-edit"></span> Edit
+							</a> 
+							<a class="btn btn-danger btn-xs btnDelete" href="#"
+							   th:href="@{/room/{id}/delete(id=${room.getId()})}"> 
+							   <span class="fa fa-remove"></span> Delete
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+</body>
+</html>
