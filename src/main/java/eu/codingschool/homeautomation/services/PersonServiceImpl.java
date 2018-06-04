@@ -37,7 +37,7 @@ public class PersonServiceImpl implements PersonService {
 	}
 	
 	@Override
-	public List<Person> findByEmail(String email) {
+	public Person findByEmail(String email) {
 		return personRepository.findByEmail(email);
 	}
 
@@ -47,8 +47,8 @@ public class PersonServiceImpl implements PersonService {
 	}
 	
 	@Override
-	public Set<Device> findUserDevices(Integer id) {
-		return personRepository.findUserDevices(id);
+	public Set<Device> findUserDevices(Integer personId) {
+		return personRepository.findUserDevices(personId);
 	}
 
 	@Override

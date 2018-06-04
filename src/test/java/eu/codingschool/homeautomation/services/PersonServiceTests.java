@@ -109,9 +109,8 @@ public class PersonServiceTests {
 		List<Person> persons = personService.findAll();
 		if (!persons.isEmpty()) {
 			String email = persons.get(0).getEmail();
-			List<Person> personsFoundByCriteria = personService.findByEmail(email);
+			Person personsFoundByCriteria = personService.findByEmail(email);
 			assertNotNull("Requested person does not exist", personsFoundByCriteria);
-			assertFalse("Requested person does not exist", personsFoundByCriteria.isEmpty());
 		}
 	}
 	

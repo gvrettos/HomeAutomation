@@ -56,4 +56,8 @@ public class DeviceServiceImpl implements DeviceService {
 		deviceRepository.delete(d);
 	}
 
+	@Override
+	public List<Device> findByPersonsId(Integer id) {
+		return deviceRepository.findByPersonsId(id);
+	}
 }

@@ -1,5 +1,6 @@
 package eu.codingschool.homeautomation.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -45,7 +46,7 @@ public class Person {
 	private Set<Device> devices;
 	
 	public Person() {
-		
+		this.devices= new HashSet<Device>();
 	}
 
 	public Person(String name, String surname, String email, String password, String role) {
@@ -112,4 +113,11 @@ public class Person {
 		this.devices = devices;
 	}
 	
+	public void AddDevices(Device device) {
+		this.devices.add(device);
+	}
+	
+	public void RemoveDevices() {
+		this.devices.clear();
+	}
 }

@@ -12,9 +12,9 @@ public interface PersonService {
 	Person findById(Integer id);
 	List<Person> findByName(String name);
 	List<Person> findBySurname(String surname);
-    List<Person> findByEmail(String email);
+    Person findByEmail(String email);
     List<Person> findByRole(String role);
-    Set<Device> findUserDevices(Integer id);
+    Set<Device> findUserDevices(Integer personId);
     
     Person save(Person p);
     
