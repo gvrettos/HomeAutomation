@@ -16,9 +16,9 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
 	
 	List<Person> findByName(String name);
 	List<Person> findBySurname(String surname);
-    List<Person> findByEmail(String email);
+    Person findByEmail(String email);
     List<Person> findByRole(String role);
     
     @Query("select p.devices from Person p where p.id = :id")
-    Set<Device> findUserDevices(@Param("id") Integer id);
+    Set<Device> findUserDevices(@Param("id") Integer personId);
 }

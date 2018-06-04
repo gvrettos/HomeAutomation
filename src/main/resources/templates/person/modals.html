@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Edit Person</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+	<!-- New or Edit modal -->
+	<div class="modal fade" id="modalNewOrEdit" tabindex="-1" role="dialog" th:fragment="modalNewOrEdit">
+		<div class="modal-dialog row" role="document">
+			<div class="modal-content">
+
+				<form th:action="@{${actionUrl}}" th:method="post" th:object="${person}" id="formNewOrEdit" 
+					class="form-horizontal" role="form">
+					<fieldset>
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalNewOrEditLabel"><span th:text="${modalTitle}"></span> Device</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						
+						<!-- Text input-->
+						<div class="form-group">
+							<label for="name" class="col-form-label">Name:</label> 
+							<input type="text" class="form-control" th:field="*{name}" pattern=".{3,30}" required />
+							<span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">..</span>
+						</div>
+
+						<!-- Text input-->
+						<div class="form-group">
+							<label for="surname" class="col-form-label">Surname:</label> 
+							<input type="text" class="form-control" th:field="*{surname}" pattern=".{3,30}" required />
+							<span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">..</span>
+						</div>
+
+						<!-- Text input-->
+						<div class="form-group">
+							<label for="email" class="col-form-label">Email:</label> 
+							<input type="text" class="form-control" th:field="*{email}" required />
+							<span th:if="${#fields.hasErrors('email')}" th:errors="*{email}">..</span>
+						</div>
+						
+						<!-- Text input-->
+						<div class="form-group">
+							<label for="role" class="col-form-label">Role:</label> 
+							<input type="text" class="form-control" th:field="*{role}" required />
+							<span th:if="${#fields.hasErrors('role')}" th:errors="*{role}">..</span>
+						</div>
+
+						<div class="form-group">
+							<label for="multiselectDevices" class="col-form-label">Devices</label>
+							<select name="listOfSelectedDeviceIds" id="multiselectDevices"
+								class="form-control multiselect multiselect-icon" multiple="multiple" role="multiselect">
+								<option th:each="device : ${listOfDevices}" 
+										th:selected="${listOfPersonDevices.contains(device)}"
+										th:value="${device.id}" th:text="${device.name}">Device
+								</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal" id="modalBtnClose">Close</button>
+						<input type="submit" class="btn btn-primary" value="Save" id="modalBtnSave" />
+					</div>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Delete confirmation modal -->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" th:fragment="modalDelete">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form th:action="@{${actionUrl}}" th:method="post" th:object="${person}">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Person</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p class="alert alert-danger">
+							Are you sure you want to delete user "<span id="device" th:text="|*{name} *{surname}|"></span>"?
+						</p>
+					</div>
+					<div class="modal-footer">
+						<input type="submit" id="modalBtnDoDelete" class="btn btn-danger" value="Yes, delete" />
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" 
+	xmlns:th="http://www.thymeleaf.org" 
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{index}">
+<head>
+<meta charset="UTF-8">
+<title>Users</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2 class="mb-5 mt-5">Users List</h2>
+		
+		<div class="row col-md-offset-1 custyle">
+		
+			<div id="modalHolder"></div>
+			
+			<table class="table table-striped custab" id="usersTable">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Name</th>
+						<th>Surname</th>
+						<th>Email</th>
+						<th>Role</th>
+						<th>Devices Assigned</th>
+						<th class="text-center">actions</th>
+					</tr>
+				</thead>
+				<tr th:each="person, i : ${listOfPersons}">
+					<td th:text="${i.count}"></td>
+					<!-- https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#keeping-iteration-status -->
+					<td th:text="${person.getName()}">Name</td>
+					<td th:text="${person.getSurname()}">Surname</td>
+					<td th:text="${person.getEmail()}">Email</td>
+					<td th:text="${person.getRole()}">Role</td>
+					<td>
+						<span th:each="a, device : ${person.getDevices()}"
+							  th:text="!${device.last} ? ${a.getName()} + ',' : ${a.getName()}">
+						</span>
+					</td>
+					<td class="text-center">
+						<a class="btn btn-info btn-xs btnEdit" href="#"
+						   th:href="@{/person/{id}/edit(id=${person.getId()})}">  
+						   <span class="fa fa-edit"></span> Edit
+						</a> 
+						<a class="btn btn-danger btn-xs btnDelete" href="#"
+						   th:href="@{/person/{id}/delete(id=${person.getId()})}"> 
+						   <span class="fa fa-remove"></span> Delete
+						</a>
+					</td>
+				</tr>
+
+			</table>
+		</div>
+	</div>
+</body>
+
+
+</html>
