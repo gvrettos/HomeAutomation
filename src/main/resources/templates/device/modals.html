@@ -40,7 +40,7 @@
 						<div class="form-group">
 							<label for="deviceType.type" class="col-form-label">Device Type:</label> 
 							
-							<select class="custom-select" id="inputGroupSelectDeviceType" th:field="*{deviceType}" required><!-- th:selected="${deviceType.id == device.deviceType.id}" -->
+							<select class="form-control custom-select" id="inputGroupSelectDeviceType" th:field="*{deviceType}" required><!-- th:selected="${deviceType.id == device.deviceType.id}" -->
 							    <option value="">Choose...</option>
 							    <option th:each="deviceType : ${allDeviceTypes}" 
 						           		th:value="${deviceType.id}" th:text="${deviceType.type}"
@@ -59,7 +59,7 @@
 						
 						<div class="form-group">
 							<label for="device.room.id" class="col-form-label">Assign to room:</label> 
-							<select class="custom-select" id="inputGroupSelectRoom" th:field="*{room}" required><!-- th:selected="${room.id == device.room.id}" -->
+							<select class="form-control custom-select" id="inputGroupSelectRoom" th:field="*{room}" required><!-- th:selected="${room.id == device.room.id}" -->
 								<option value="">Choose...</option>
 							    <option th:each="room : ${allRooms}" 
 						           		th:value="${room.id}" th:text="${room.name}"
