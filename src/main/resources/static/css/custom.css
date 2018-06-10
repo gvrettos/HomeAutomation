@@ -1,7 +1,5 @@
-a.btnEdit,
-a.btnDelete,
-a#doDelete {
-	color: white !important;
+html, body, h1, h2, h3, h4, h5 {
+	font-family: "Raleway", sans-serif
 }
 
 .custab {

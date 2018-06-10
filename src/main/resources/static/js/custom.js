@@ -47,4 +47,49 @@ $(document).ready(function() {
 			}
 		});
 	}
+	
+	
+	
+	
+	
+	// Functions for user
+	function openEditModal(id) {
+	    $.ajax({
+	        url: "EditPerson/"+id,
+	        success: function(data) {
+	        	console.log(data);
+	            $("#modalHolder").html(data);
+	        	$("#personEditModal").modal();
+	        }
+	    });
+	    var listDevices  = $('#multiselectDevices').multiselect({
+	    	includeSelectAllOption: true,
+	    	enableFiltering : true
+	   	});
+	          
+	}
+	    
+   function openDeleteModal(id){
+    $.ajax({
+        url: "DeletePerson/"+id,
+        success: function(data) {
+            console.log(data);
+             $("#modalHolder").html(data);
+        	 $("#personDeleteModal").modal();
+            }
+        });
+   }
+	   
+   function deleteConfirm(id){
+	   var personId={"personId" : id};
+	   $.ajax({
+	        url: "DeletePersonConfirm/"+id,
+	        type:'POST',
+	        success:function(data){
+	         $("#personDeleteModal").hide();
+	           window.location.href="persons";
+	           $("#usersTable").ajax.reload();
+	        }
+	   });
+   }
 });
