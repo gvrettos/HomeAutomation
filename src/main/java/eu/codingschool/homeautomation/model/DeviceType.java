@@ -26,9 +26,23 @@ public class DeviceType {
 	@Column(name = "information_type")
 	private String informationType;
 	
-	// TODO Removed, according to Sokratis' comment on Slack 
-//	@OneToMany(mappedBy = "deviceType")
-//	private Set<Device> devices;
+	@Column(name = "unit_of_measure")
+	private String unitOfMeasure;
+	
+	@Column(name = "min_value")
+	private Integer minValue;
+	
+	@Column(name = "max_value")
+	private Integer maxValue;
+	
+	@Column(name = "interaction_type")
+	private String interactionType;
+	
+	@Column(name = "icon")
+	private String icon;
+	
+	@Column(name = "group_color")
+	private String groupColor;
 
 	public DeviceType() {
 		
@@ -63,12 +77,52 @@ public class DeviceType {
 		this.informationType = informationType;
 	}
 
-//	public Set<Device> getDevices() {
-//		return devices;
-//	}
-//
-//	public void setDevices(Set<Device> devices) {
-//		this.devices = devices;
-//	}
+	public String getUnitOfMeasure() {
+		return unitOfMeasure;
+	}
+
+	public void setUnitOfMeasure(String unitOfMeasure) {
+		this.unitOfMeasure = unitOfMeasure;
+	}
+
+	public Integer getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(Integer minValue) {
+		this.minValue = minValue;
+	}
+
+	public Integer getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(Integer maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public String getInteractionType() {
+		return interactionType;
+	}
+
+	public void setInteractionType(String interactionType) {
+		this.interactionType = interactionType;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+	
+	public String getGroupColor() {
+		return groupColor;
+	}
+
+	public void setGroupColor(String groupColor) {
+		this.groupColor = groupColor;
+	}
 
 }

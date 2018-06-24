@@ -18,4 +18,6 @@ public interface DeviceService {
     
 	void delete(Integer id);
 	void delete(Device d);
+	
+	List<Device> findByPersonsId(Integer id);
 }

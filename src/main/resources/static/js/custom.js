@@ -11,7 +11,7 @@ $(document).ready(function() {
 	
 	function formCallback(event) {
 		event.preventDefault();
-		
+
 		// just display the modal or pre-fill the form for edits
 		$.ajax({
 			url: $(this).attr('href'), 
@@ -37,7 +37,6 @@ $(document).ready(function() {
 			type: "POST",
 			url: $('#formNewOrEdit').attr('action'),
 			success: function(result) { 
-//				console.log(result);
 				$('#modalHolder').html(result);
 				$('#modalNewOrEdit').modal("show"); // open the correct modal programmatically
 				$('#modalBtnSave').click(formPostCallback);

@@ -11,7 +11,6 @@
     <title>Home Automation</title>
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
-    <!-- <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"> -->
 
     <!-- Custom fonts for this template -->
     <link href="vendor/font-awesome/css/fontawesome-all.min.css" th:href="@{/vendor/font-awesome/css/fontawesome-all.min.css}" rel="stylesheet">
@@ -21,6 +20,8 @@
     <!-- Custom styles for this template -->
     <link href="css/custom.css" th:href="@{/css/custom.css}" rel="stylesheet">
     <link href="css/sidebar.css" th:href="@{/css/sidebar.css}" rel="stylesheet">
+    <!-- https://bootsnipp.com/snippets/GaxR2 -->
+    <link href="css/switch.css" th:href="@{/css/switch.css}" rel="stylesheet">
 
 </head>
 
@@ -43,7 +44,7 @@
                 <div class="sidebar-menu">
                     <ul>
                         <li class="header-menu">
-                            <span>Management</span>
+                            <span>System Management</span>
                         </li>
                         <li>
                             <a href="#" th:href="@{/person/list}">
@@ -64,23 +65,26 @@
                             </a>
                         </li>
                         <li class="header-menu">
-                            <span>Using Devices</span>
+                            <span>Devices Management</span>
+                        </li>
+                        <li>
+                            <a href="#" th:href="@{/device/user/all}">
+                                <i class="fa fa-cogs"></i>
+                                <span>All rooms</span>
+                            </a>
                         </li>
                         <li class="sidebar-dropdown">
                             <a href="#">
                                 <i class="fa fa-bed"></i>
-                                <span>Rooms</span>
+                                <span>Specific rooms</span>
                             </a>
                             <div class="sidebar-submenu">
                                 <ul>
                                     <li>
-                                        <a href="#" th:href="@{/device/user/all}">All rooms</a>
-                                    </li>
-                                    <li>
                                         <a href="#">Bedroom</a>
                                     </li>
                                     <li>
-                                        <a href="#">Living Room</a>
+                                        <a href="#">Living room</a>
                                     </li>
                                     <li>
                                         <a href="#">Kitchen</a>
@@ -111,12 +115,14 @@
 
 	<!-- Bootstrap 4.1 core JavaScript -->
 	<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}"></script>
-	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
     <!-- Custom scripts for this template -->
     <!-- <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script> -->
 	<script src="../static/js/custom.js" th:src="@{/js/custom.js}"></script>
-	<script src="../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
+    <script src="../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
+    <script src="../static/js/plus-minus.js" th:src="@{/js/plus-minus.js}"></script>
+    <script src="../static/js/switch.js" th:src="@{/js/switch.js}"></script>
 	
 
 	<th:block layout:fragment="scripts"></th:block>
