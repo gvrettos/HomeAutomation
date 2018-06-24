@@ -52,10 +52,10 @@
 
 						<div class="form-group">
 							<label for="multiselectDevices" class="col-form-label">Devices</label>
-							<select name="listOfSelectedDeviceIds" id="multiselectDevices"
+							<select name="selectedDeviceIds" id="multiselectDevices"
 								class="form-control multiselect multiselect-icon" multiple="multiple" role="multiselect">
-								<option th:each="device : ${listOfDevices}" 
-										th:selected="${listOfPersonDevices.contains(device)}"
+								<option th:each="device : ${devices}" 
+										th:selected="${personDevices.contains(device)}"
 										th:value="${device.id}" th:text="${device.name}">Device
 								</option>
 							</select>
