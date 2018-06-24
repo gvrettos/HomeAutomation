@@ -27,7 +27,7 @@
 						<th class="text-center">actions</th>
 					</tr>
 				</thead>
-				<tr th:each="person, i : ${listOfPersons}">
+				<tr th:each="person, i : ${people}">
 					<td th:text="${i.count}"></td>
 					<!-- https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#keeping-iteration-status -->
 					<td th:text="${person.getName()}">Name</td>

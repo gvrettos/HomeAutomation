@@ -113,11 +113,15 @@ public class Person {
 		this.devices = devices;
 	}
 	
-	public void AddDevices(Device device) {
-		this.devices.add(device);
+	public void addDevice(Device device) {
+		if (this.devices != null) {
+			this.devices.add(device);
+		}
 	}
 	
-	public void RemoveDevices() {
-		this.devices.clear();
+	public void removeAllDevices() {
+		if (this.devices != null) {
+			this.devices.clear();
+		}
 	}
 }

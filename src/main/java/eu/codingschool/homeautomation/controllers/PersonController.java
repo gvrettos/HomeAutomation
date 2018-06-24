@@ -30,9 +30,9 @@ public class PersonController {
 	public PersonValidator personValidator;
 
 	@RequestMapping(value = "/person/list", method = RequestMethod.GET)
-	public String Index(Model model) {
-		List<Person> listOfPersons = personService.findAll();
-		model.addAttribute("listOfPersons", listOfPersons);
+	public String getPeople(Model model) {
+		List<Person> people = personService.findAll();
+		model.addAttribute("people", people);
 		return "person/list";
 	}
 
@@ -40,12 +40,12 @@ public class PersonController {
 	 * Display form for an already saved person with pre-filled fields.
 	 */
 	@RequestMapping(value = "/person/{id}/edit", method = RequestMethod.GET)
-	public String EditPerson(@PathVariable("id") int id, Model model) {
+	public String viewPerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
-		List<Device> listOfDevices = deviceService.findAll();
-		List<Device> listOfPersonDevices = deviceService.findByPersonsId(id);
-		model.addAttribute("listOfPersonDevices", listOfPersonDevices);
-		model.addAttribute("listOfDevices", listOfDevices);
+		List<Device> devices = deviceService.findAll();
+		List<Device> personDevices = deviceService.findByPersonsId(id);
+		model.addAttribute("personDevices", personDevices);
+		model.addAttribute("devices", devices);
 		model.addAttribute("actionUrl", "/person/" + id + "/edit");
 		model.addAttribute("modalTitle", "Edit");
 		model.addAttribute("person", person);
@@ -56,28 +56,28 @@ public class PersonController {
 	 * Update a person by submitting the form.
 	 */
 	@RequestMapping(value = "/person/{id}/edit", method = RequestMethod.POST)
-	public String EditPerson(@ModelAttribute("person") Person person,
-			@RequestParam(value = "listOfSelectedDeviceIds", required = false) List<String> listOfSelectedDeviceIds,
+	public String editPerson(
+			@ModelAttribute("person") Person person,
+			@RequestParam(value = "selectedDeviceIds", required = false) List<String> selectedDeviceIds,
 			BindingResult result, Model model) {
-
-		// personValidator.validate(person, result);
+		personValidator.validate(person, result);
 
 		if (result.hasErrors()) {
+			// reload the same page fragment
 			model.addAttribute("person", person);
 			return "person/modals :: modalNewOrEdit";
 		}
 
-		if (listOfSelectedDeviceIds != null) {
-			for (String deviceIdStr : listOfSelectedDeviceIds) {
+		// add user-assigned devices
+		if (selectedDeviceIds != null) {
+			for (String deviceIdStr : selectedDeviceIds) {
 				int deviceId = Integer.parseInt(deviceIdStr);
 				Device device = deviceService.findById(deviceId);
-				person.AddDevices(device);
+				person.addDevice(device);
 			}
 		}
 
 		personService.save(person);
-
-		model.addAttribute("listOfPersons", personService.findAll());
 		return "redirect:/person/list";
 	}
 
@@ -85,12 +85,10 @@ public class PersonController {
 	 * Display a confirmation dialog before deleting a user.
 	 */
 	@RequestMapping(value = "/person/{id}/delete", method = RequestMethod.GET)
-	public String DeletePerson(@PathVariable("id") int id, Model model) {
-
+	public String confirmDeletePerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
 		model.addAttribute("person", person);
 		model.addAttribute("actionUrl", "/person/" + id + "/delete");
-
 		return "person/modals :: modalDelete";
 	}
 
@@ -98,16 +96,10 @@ public class PersonController {
 	 * Delete the person after accepting the deletion confirmation.
 	 */
 	@RequestMapping(value = "/person/{id}/delete", method = RequestMethod.POST)
-	public String DeletePersonConfirm(@PathVariable("id") int id, Model model) {
-
+	public String doDeletePerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
-		List<Device> PersonDevices = deviceService.findByPersonsId(id);
-		if (PersonDevices.size() != 0) {
-			person.RemoveDevices();
-		}
+		person.removeAllDevices();
 		personService.delete(person);
-
-		model.addAttribute("listOfPersons", personService.findAll());
 		return "redirect:/person/list";
 	}
 
