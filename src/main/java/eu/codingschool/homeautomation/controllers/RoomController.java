@@ -87,6 +87,7 @@ public class RoomController {
 	 */
 	@RequestMapping(value = "/room/{id}/delete", method = RequestMethod.POST)
 	public String doDeleteRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
+		// TODO check for foreign constraints - Room may be already used by a device
 		roomService.delete(room);
 		return "redirect:/room/list";
 	}

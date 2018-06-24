@@ -125,19 +125,50 @@ public class DeviceController {
 		return "redirect:/device/list";
 	}
 	
-//	@RequestMapping(value = "/device/{id}/updateStatus/{status}", method = RequestMethod.POST)
-//	public String updateDeviceStatus(@ModelAttribute("device") Device device, 
-//			@PathVariable(value="status") String status, BindingResult result, ModelMap model) {
-//		device.setStatus(status);
-//		deviceService.save(device);
-//		return "redirect:/device/list";
-//	}
-//	
-//	@RequestMapping(value = "/device/{id}/updateValue/{value}", method = RequestMethod.POST)
-//	public String updateDeviceInformationValue(@ModelAttribute("device") Device device, 
-//			@PathVariable(value="value") String informationValue, BindingResult result, ModelMap model) {
-//		device.setInformationValue(informationValue);
-//		deviceService.save(device);
-//		return "redirect:/device/list";
-//	}
+	/**
+	 * Display the devices that can be operated by an ADMIN
+	 */
+	@RequestMapping(value = "/device/user/all", method = RequestMethod.GET)
+	public String showAdminDevices(Model model) {
+		model.addAttribute("devices", deviceService.findAll());
+		return "userDevices/grid";
+	}
+	
+	/**
+	 * TODO Display the devices that can be operated by any USER
+	 */
+	@RequestMapping(value = "/device/user/{id}", method = RequestMethod.GET)
+	public String showUserDevices(@PathVariable(value="id") int userId, Model model) {
+		model.addAttribute("devices", deviceService.findByPersonsId(userId));
+		return "userDevices/grid";
+	}
+	
+	/**
+	 * Set the device on/off.
+	 */
+	@RequestMapping(value = "/device/{id}/updateStatus/{status}", method = RequestMethod.POST)
+	public String updateDeviceStatus(
+			@PathVariable(value="id") int deviceId, 
+			@PathVariable(value="status") boolean status) {
+		Device device = deviceService.findById(deviceId);
+		device.setStatusOn(status);
+		deviceService.save(device);
+		// TODO redirect should change according to the logged in user
+		return "redirect:/device/user/all";
+	}
+	
+	/**
+	 * Increase/Decrease the device's information value. 
+	 */
+	@RequestMapping(value = "/device/{id}/updateValue/{value}", method = RequestMethod.POST)
+	public String updateDeviceInformationValue(
+			@PathVariable(value="id") int deviceId, 
+			@PathVariable(value="value") String informationValue) {
+		Device device = deviceService.findById(deviceId);
+		device.setInformationValue(informationValue);
+		deviceService.save(device);
+		// TODO redirect should change according to the logged in user
+		return "redirect:/device/user/all";
+	}
+
 }

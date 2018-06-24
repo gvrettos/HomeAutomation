@@ -21,4 +21,6 @@ public interface DeviceRepository extends JpaRepository<Device, Integer> {
     
     @Query("select d.persons from Device d where d.id = :id")
     Set<Person> findUsersAssigned(@Param("id") Integer id);
+    
+    List<Device> findByPersonsId(Integer id);
 }

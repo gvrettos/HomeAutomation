@@ -119,4 +119,21 @@ public class Device {
 	public void setPersons(Set<Person> persons) {
 		this.persons = persons;
 	}
+	
+	public String getInformationText() {
+		String str = new String();
+		
+		if (deviceType.getInformationType() != null) {
+			str += deviceType.getInformationType();
+		}
+		if (deviceType.getUnitOfMeasure() != null) {
+			str += " " + deviceType.getUnitOfMeasure();
+		}
+		
+		return str;
+		 
+	}
+	public String getInteractionType() {
+		return deviceType.getInteractionType();
+	}
 }
