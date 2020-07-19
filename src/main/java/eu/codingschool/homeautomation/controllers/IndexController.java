@@ -17,10 +17,6 @@ import eu.codingschool.homeautomation.validators.PersonValidator;
 
 @Controller
 public class IndexController {
-	
-	// FIXME 
-	// The user should be dynamic
-	public static final int LOGGED_IN_USER = 40;
 
 	@Autowired
 	private PersonValidator personValidator;

@@ -3,6 +3,8 @@ package eu.codingschool.homeautomation.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -14,14 +16,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.codingschool.homeautomation.model.Device;
 import eu.codingschool.homeautomation.model.DeviceType;
+import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.model.Room;
 import eu.codingschool.homeautomation.services.DeviceService;
 import eu.codingschool.homeautomation.services.DeviceTypeService;
+import eu.codingschool.homeautomation.services.PersonService;
 import eu.codingschool.homeautomation.services.RoomService;
 import eu.codingschool.homeautomation.validators.DeviceValidator;
 
 @Controller
 public class DeviceController {
+	
+	@Autowired
+	private PersonService personService;
 	
 	@Autowired
 	private DeviceService deviceService;
@@ -36,24 +43,31 @@ public class DeviceController {
 	private DeviceValidator deviceValidator;
 	
 	
-	@RequestMapping(value = "/device/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin/device/list", method = RequestMethod.GET)
 	public String getDevices(Model model) {
+		
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
+			throw new AccessDeniedException("");
+		}
+		
 		List<Device> devices = deviceService.findAll();
 		model.addAttribute("devices", devices);
+		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "device/list";
 	}
 	
 	/**
 	 * Display form for new device type with empty fields.
 	 */
-	@RequestMapping(value = "/device/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin/device/new", method = RequestMethod.GET)
 	public String newDevice(Model model) {
 		model.addAttribute("device", new Device());
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
 		List<Room> allRooms = roomService.findAll();
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
-		model.addAttribute("actionUrl", "/device/new");
+		model.addAttribute("actionUrl", "/admin/device/new");
 		model.addAttribute("modalTitle", "New");
 		return "device/modals :: modalNewOrEdit";
 	}
@@ -61,7 +75,7 @@ public class DeviceController {
 	/**
 	 * Save a new device type by submitting the form.
 	 */
-	@RequestMapping(value = "/device/new", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/device/new", method = RequestMethod.POST)
 	public String addDevice(@ModelAttribute("device") Device device, BindingResult result, 
 			ModelMap model) {
 		return saveOrUpdateDevice(device, result);
@@ -70,7 +84,7 @@ public class DeviceController {
 	/**
 	 * Display form for an already saved device type with pre-filled fields.
 	 */
-	@RequestMapping(value = "/device/{id}/edit", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin/device/{id}/edit", method = RequestMethod.GET)
 	public String viewDevice(@PathVariable(value="id") int id, Model model) {
 		Device device = deviceService.findById(id);
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
@@ -78,7 +92,7 @@ public class DeviceController {
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
 		model.addAttribute("device", device);
-		model.addAttribute("actionUrl", "/device/" + id + "/edit");
+		model.addAttribute("actionUrl", "/admin/device/" + id + "/edit");
 		model.addAttribute("modalTitle", "Edit");
 		return "device/modals :: modalNewOrEdit";
 	}
@@ -86,31 +100,30 @@ public class DeviceController {
 	/**
 	 * Update a device type by submitting the form.
 	 */
-	@RequestMapping(value = "/device/{id}/edit", method = RequestMethod.POST)
-	public String editDevice(@ModelAttribute("device") Device device, BindingResult result, 
-			ModelMap model) {
+	@RequestMapping(value = "/admin/device/{id}/edit", method = RequestMethod.POST)
+	public String editDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
 		return saveOrUpdateDevice(device, result);
 	}
 	
 	/**
 	 * Display a confirmation dialog before deleting a device type.
 	 */
-	@RequestMapping(value = "/device/{id}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin/device/{id}/delete", method = RequestMethod.GET)
 	public String confrimDeleteDevice(@PathVariable(value="id") int id, Model model) {
 		Device device = deviceService.findById(id);
 		model.addAttribute("device", device);
-		model.addAttribute("actionUrl", "/device/" + id + "/delete");
+		model.addAttribute("actionUrl", "/admin/device/" + id + "/delete");
 		return "device/modals :: modalDelete";
 	}
 	
 	/**
 	 * Delete the device type after accepting the deletion confirmation.
 	 */
-	@RequestMapping(value = "/device/{id}/delete", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/device/{id}/delete", method = RequestMethod.POST)
 	public String doDeleteDevice(@ModelAttribute("device") Device device, BindingResult result, 
 			ModelMap model) {
 		deviceService.delete(device);
-		return "redirect:/device/list";
+		return "redirect:/admin/device/list";
 	}
 	
 	private String saveOrUpdateDevice(Device device, BindingResult result) {
@@ -122,24 +135,42 @@ public class DeviceController {
 		}
 		
 		deviceService.save(device);
-		return "redirect:/device/list";
+		return "redirect:/admin/device/list";
 	}
 	
 	/**
 	 * Display the devices that can be operated by an ADMIN
 	 */
-	@RequestMapping(value = "/device/user/all", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin/device/user/all", method = RequestMethod.GET)
 	public String showAdminDevices(Model model) {
+		
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
+			throw new AccessDeniedException("");
+		}
+		
 		model.addAttribute("devices", deviceService.findAll());
+		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "userDevices/grid";
 	}
 	
 	/**
-	 * TODO Display the devices that can be operated by any USER
+	 * Display the devices that can be operated by any USER
 	 */
 	@RequestMapping(value = "/device/user/{id}", method = RequestMethod.GET)
 	public String showUserDevices(@PathVariable(value="id") int userId, Model model) {
+		
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		Person requestedUser = personService.findById(userId);
+		if ( loggedInUser == null 
+				|| requestedUser == null 
+				|| loggedInUser.getUsername() == null 
+				|| !loggedInUser.getUsername().equals(requestedUser.getEmail()) ) {
+			throw new AccessDeniedException("");
+		}
+		
 		model.addAttribute("devices", deviceService.findByPersonsId(userId));
+    	model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "userDevices/grid";
 	}
 	
@@ -150,11 +181,25 @@ public class DeviceController {
 	public String updateDeviceStatus(
 			@PathVariable(value="id") int deviceId, 
 			@PathVariable(value="status") boolean status) {
+		
 		Device device = deviceService.findById(deviceId);
 		device.setStatusOn(status);
 		deviceService.save(device);
-		// TODO redirect should change according to the logged in user
-		return "redirect:/device/user/all";
+		
+		// redirect according to the logged in user
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if (loggedInUser != null && loggedInUser.getUsername() != null) {
+			Person loggedInPerson = personService.findByEmail(loggedInUser.getUsername());
+			if (loggedInPerson != null) {
+				if ("ADMIN".equals(loggedInPerson.getRole())) {
+					return "redirect:/admin/device/user/all";
+				}
+				else if ("USER".equals(loggedInPerson.getRole())) {
+					return "redirect:/device/user/" + loggedInPerson.getId();
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -164,11 +209,25 @@ public class DeviceController {
 	public String updateDeviceInformationValue(
 			@PathVariable(value="id") int deviceId, 
 			@PathVariable(value="value") String informationValue) {
+		
 		Device device = deviceService.findById(deviceId);
 		device.setInformationValue(informationValue);
 		deviceService.save(device);
-		// TODO redirect should change according to the logged in user
-		return "redirect:/device/user/all";
+		
+		// redirect according to the logged in user
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if (loggedInUser != null && loggedInUser.getUsername() != null) {
+			Person loggedInPerson = personService.findByEmail(loggedInUser.getUsername());
+			if (loggedInPerson != null) {
+				if ("ADMIN".equals(loggedInPerson.getRole())) {
+					return "redirect:/admin/device/user/all";
+				}
+				else if ("USER".equals(loggedInPerson.getRole())) {
+					return "redirect:/device/user/" + loggedInPerson.getId();
+				}
+			}
+		}
+		return null;
 	}
 
 }

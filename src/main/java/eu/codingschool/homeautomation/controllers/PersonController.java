@@ -4,6 +4,8 @@ package eu.codingschool.homeautomation.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,19 +22,29 @@ import eu.codingschool.homeautomation.services.PersonService;
 import eu.codingschool.homeautomation.validators.PersonValidator;
 
 @Controller
+@RequestMapping("/admin")
 public class PersonController {
 
 	@Autowired
 	public PersonService personService;
+	
 	@Autowired
 	public DeviceService deviceService;
+	
 	@Autowired
 	public PersonValidator personValidator;
 
 	@RequestMapping(value = "/person/list", method = RequestMethod.GET)
 	public String getPeople(Model model) {
+		
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
+			throw new AccessDeniedException("");
+		}
+		
 		List<Person> people = personService.findAll();
 		model.addAttribute("people", people);
+		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "person/list";
 	}
 
@@ -46,7 +58,7 @@ public class PersonController {
 		List<Device> personDevices = deviceService.findByPersonsId(id);
 		model.addAttribute("personDevices", personDevices);
 		model.addAttribute("devices", devices);
-		model.addAttribute("actionUrl", "/person/" + id + "/edit");
+		model.addAttribute("actionUrl", "/admin/person/" + id + "/edit");
 		model.addAttribute("modalTitle", "Edit");
 		model.addAttribute("person", person);
 		return "person/modals :: modalNewOrEdit";
@@ -60,6 +72,12 @@ public class PersonController {
 			@ModelAttribute("person") Person person,
 			@RequestParam(value = "selectedDeviceIds", required = false) List<String> selectedDeviceIds,
 			BindingResult result, Model model) {
+		
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
+			throw new AccessDeniedException("");
+		}
+		
 		personValidator.validate(person, result);
 
 		if (result.hasErrors()) {
@@ -78,7 +96,8 @@ public class PersonController {
 		}
 
 		personService.save(person);
-		return "redirect:/person/list";
+		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+		return "redirect:/admin/person/list";
 	}
 
 	/**
@@ -88,7 +107,7 @@ public class PersonController {
 	public String confirmDeletePerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
 		model.addAttribute("person", person);
-		model.addAttribute("actionUrl", "/person/" + id + "/delete");
+		model.addAttribute("actionUrl", "/admin/person/" + id + "/delete");
 		return "person/modals :: modalDelete";
 	}
 
@@ -100,7 +119,7 @@ public class PersonController {
 		Person person = personService.findById(id);
 		person.removeAllDevices();
 		personService.delete(person);
-		return "redirect:/person/list";
+		return "redirect:/admin/person/list";
 	}
 
 }

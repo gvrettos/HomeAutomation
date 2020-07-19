@@ -16,7 +16,7 @@
 			<div id="modalHolder"></div>
 			
 			<p>
-				<a href="#" th:href="@{/device/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
+				<a href="#" th:href="@{/admin/room/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
 					<b>+</b> Add new Room
 				</a>
 			</p>
@@ -31,17 +31,17 @@
 				</thead>
 				<tbody>
 					<tr th:each="room, i : ${room}">
-					<td th:text="${i.count}"></td>
+						<td th:text="${i.count}"></td>
 						<!-- <td th:text="${room.getId()}">ID</td> -->
 						<td th:text="${room.getName()}">Name of the Room</td>
 						
 						<td class="text-center">
 							<a class="btn btn-info btn-xs btnEdit" href="#"
-							   th:href="@{/room/{id}/edit(id=${room.getId()})}">  
+							   th:href="@{/admin/room/{id}/edit(id=${room.getId()})}">  
 							   <span class="fa fa-edit"></span> Edit
 							</a> 
 							<a class="btn btn-danger btn-xs btnDelete" href="#"
-							   th:href="@{/room/{id}/delete(id=${room.getId()})}"> 
+							   th:href="@{/admin/room/{id}/delete(id=${room.getId()})}"> 
 							   <span class="fas fa-times"></span> Delete
 							</a>
 						</td>

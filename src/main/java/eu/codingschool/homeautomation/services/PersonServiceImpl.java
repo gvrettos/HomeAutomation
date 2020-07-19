@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import eu.codingschool.homeautomation.model.Device;
@@ -15,6 +18,9 @@ public class PersonServiceImpl implements PersonService {
 	
 	@Autowired
 	PersonRepository personRepository;
+	
+	@Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
 	public List<Person> findAll() {
@@ -53,6 +59,10 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public Person save(Person p) {
+		if (p.getPassword() != null) {
+			p.setPassword(bCryptPasswordEncoder.encode(p.getPassword()));
+			p.setRole("USER");
+		}
 		return personRepository.save(p);
 	}
 
@@ -65,4 +75,14 @@ public class PersonServiceImpl implements PersonService {
 	public void delete(Person p) {
 		personRepository.delete(p);
 	}
+	
+	@Override
+	public UserDetails getLoggedInUser() {
+	    Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    if (userDetails instanceof UserDetails) {
+	    	return (UserDetails)userDetails;
+	    }
+	    return null;
+	}
+	
 }
