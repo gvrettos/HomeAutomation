@@ -40,10 +40,10 @@ $(document).ready(function() {
     }
 
     function enableDisableBtnOnBoundaryValues(value, input) {
-        if (value == input.attr('max')) {
+        if (value >= input.attr('max')) {
             disableButton(findBtnPlus(input));
         }
-        if (value == input.attr('min')) {
+        if (value <= input.attr('min')) {
             disableButton(findBtnMinus(input));
         }
     }

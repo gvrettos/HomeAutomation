@@ -29,46 +29,59 @@
     <div class="page-wrapper chiller-theme toggled">
         <nav id="sidebar" class="sidebar-wrapper">
             <div class="sidebar-content">
+            
                 <div class="sidebar-header">
                     <div class="user-info">
-                        <span class="user-name">Jοhn
-                            <strong>Smith</strong>
-                            <a href="#">
+                        <span class="user-name">
+                            <span th:text="${loggedInUser.getName()}"></span>
+                            <strong th:text="${loggedInUser.getSurname()}">Anonymous</strong>
+                            <a href="/homeAutomation/logout">
                                 <i class="fa fa-power-off"></i>
                             </a>
                         </span>
-                        <span class="user-role">Administrator</span>
+                        <span class="user-role" th:if="${loggedInUser.getRole() == 'ADMIN'}">Administrator</span>
                     </div>
                 </div>
-                <!-- sidebar-header -->
+                <!-- sidebar-header end -->
+                
                 <div class="sidebar-menu">
                     <ul>
-                        <li class="header-menu">
+                        <li class="header-menu" 
+                        	th:if="${loggedInUser.getRole() == 'ADMIN'}">
                             <span>System Management</span>
                         </li>
-                        <li>
-                            <a href="#" th:href="@{/person/list}">
+                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
+                            <a href="#" th:href="@{/admin/person/list}">
                                 <i class="fa fa-user"></i>
                                 <span>Users</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#" th:href="@{/device/list}">
+                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
+                            <a href="#" th:href="@{/admin/device/list}">
                                 <i class="fa fa-cogs"></i>
                                 <span>Devices</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#" th:href="@{/room/list}">
+                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
+                            <a href="#" th:href="@{/admin/room/list}">
                                 <i class="fa fa-bed"></i>
                                 <span>Rooms</span>
                             </a>
                         </li>
+                        
                         <li class="header-menu">
                             <span>Devices Management</span>
                         </li>
-                        <li>
-                            <a href="#" th:href="@{/device/user/all}">
+                        <li th:switch="${loggedInUser.getRole()}">
+                            <a href="#" 
+                               th:case="ADMIN" 
+                               th:href="@{/admin/device/user/all}">
+                               <i class="fa fa-cogs"></i>
+                                <span>All rooms</span>
+                            </a>
+                            <a href="#" 
+                               th:case="USER" 
+                               th:href="@{/device/user/{id}(id=${loggedInUser.getId()})}">
                                 <i class="fa fa-cogs"></i>
                                 <span>All rooms</span>
                             </a>
@@ -97,10 +110,10 @@
                         </li>
                     </ul>
                 </div>
-                <!-- sidebar-menu -->
+                <!-- sidebar-menu end -->
             </div>
         </nav>
-        <!-- sidebar menu end -->
+        <!-- sidebar-wrapper end -->
         
 
         <main class="page-content">

@@ -17,6 +17,7 @@ import eu.codingschool.homeautomation.services.DeviceTypeService;
 import eu.codingschool.homeautomation.validators.DeviceTypeValidator;
 
 @Controller
+@RequestMapping("/admin")
 public class DeviceTypeController {
 	
 	@Autowired
