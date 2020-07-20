@@ -19,6 +19,7 @@ public interface PersonService {
     Set<Device> findUserDevices(Integer personId);
     
     Person save(Person p);
+    void update(Person personModel, List<Device> selectedDevices);
     
 	void delete(Integer id);
 	void delete(Person p);

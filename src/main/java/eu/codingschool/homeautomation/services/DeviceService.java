@@ -20,4 +20,5 @@ public interface DeviceService {
 	void delete(Device d);
 	
 	List<Device> findByPersonsId(Integer id);
+	List<Device> getSelectedDevices(List<String> selectedDeviceIds);
 }
