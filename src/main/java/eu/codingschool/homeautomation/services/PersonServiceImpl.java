@@ -1,7 +1,10 @@
 package eu.codingschool.homeautomation.services;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,6 +67,17 @@ public class PersonServiceImpl implements PersonService {
 			p.setRole("USER");
 		}
 		return personRepository.save(p);
+	}
+	
+	@Override
+	@Transactional
+	public void update(Person personModel, List<Device> selectedDevices) {
+		Person personDB = findById(personModel.getId());
+		personDB.setName(personModel.getName());
+		personDB.setSurname(personModel.getSurname());
+		personDB.setEmail(personModel.getEmail());
+		personDB.setRole(personModel.getRole());
+		personDB.setDevices(new HashSet<>(selectedDevices));
 	}
 
 	@Override

@@ -84,18 +84,10 @@ public class PersonController {
 			// reload the same page fragment
 			model.addAttribute("person", person);
 			return "person/modals :: modalNewOrEdit";
-		}
-
-		// add user-assigned devices
-		if (selectedDeviceIds != null) {
-			for (String deviceIdStr : selectedDeviceIds) {
-				int deviceId = Integer.parseInt(deviceIdStr);
-				Device device = deviceService.findById(deviceId);
-				person.addDevice(device);
-			}
-		}
-
-		personService.save(person);
+		}		
+		
+		personService.update(person, deviceService.getSelectedDevices(selectedDeviceIds));
+		
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "redirect:/admin/person/list";
 	}

@@ -1,5 +1,6 @@
 package eu.codingschool.homeautomation.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -59,5 +60,17 @@ public class DeviceServiceImpl implements DeviceService {
 	@Override
 	public List<Device> findByPersonsId(Integer id) {
 		return deviceRepository.findByPersonsId(id);
+	}
+	
+	@Override
+	public List<Device> getSelectedDevices(List<String> selectedDeviceIds) {
+		List<Device> devices = new ArrayList<>();
+		if (selectedDeviceIds != null) {
+			for (String deviceIdStr : selectedDeviceIds) {
+				int deviceId = Integer.parseInt(deviceIdStr);
+				devices.add(findById(deviceId));
+			}
+		}
+		return devices;
 	}
 }
