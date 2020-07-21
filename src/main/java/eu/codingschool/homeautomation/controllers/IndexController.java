@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.services.PersonService;
+import eu.codingschool.homeautomation.services.RoomService;
 import eu.codingschool.homeautomation.validators.PersonValidator;
 
 @Controller
@@ -23,13 +24,25 @@ public class IndexController {
 
 	@Autowired
 	private PersonService personService;
+	
+	@Autowired
+	private RoomService roomService;
 
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String home(ModelMap model) {
 		Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (userDetails instanceof UserDetails) {
 			String email = ((UserDetails) userDetails).getUsername();
-			model.addAttribute("loggedInUser", personService.findByEmail(email));
+			Person loggedInUser = personService.findByEmail(email);
+			model.addAttribute("loggedInUser", loggedInUser);
+			if (loggedInUser != null) {
+				if (loggedInUser.isAdmin()) {
+					model.addAttribute("rooms", roomService.findAll());
+				}
+				else {
+					model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
+				}
+			}
 			return "index";
 		}
 		

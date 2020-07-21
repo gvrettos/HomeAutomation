@@ -19,6 +19,7 @@ import eu.codingschool.homeautomation.model.Device;
 import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.services.DeviceService;
 import eu.codingschool.homeautomation.services.PersonService;
+import eu.codingschool.homeautomation.services.RoomService;
 import eu.codingschool.homeautomation.validators.PersonValidator;
 
 @Controller
@@ -30,6 +31,9 @@ public class PersonController {
 	
 	@Autowired
 	public DeviceService deviceService;
+	
+	@Autowired
+	public RoomService roomService;
 	
 	@Autowired
 	public PersonValidator personValidator;
@@ -44,6 +48,7 @@ public class PersonController {
 		
 		List<Person> people = personService.findAll();
 		model.addAttribute("people", people);
+		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "person/list";
 	}
@@ -88,6 +93,7 @@ public class PersonController {
 		
 		personService.update(person, deviceService.getSelectedDevices(selectedDeviceIds));
 		
+		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "redirect:/admin/person/list";
 	}
