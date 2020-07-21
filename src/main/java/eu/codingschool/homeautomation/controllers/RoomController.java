@@ -111,6 +111,7 @@ public class RoomController {
 
 		if (result.hasErrors()) {
 			// reload the same page fragment
+			return "room/modals :: modalNewOrEdit";
 		}
 
 		roomService.save(room);
