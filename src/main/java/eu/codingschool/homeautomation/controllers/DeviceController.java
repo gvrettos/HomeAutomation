@@ -51,8 +51,8 @@ public class DeviceController {
 			throw new AccessDeniedException("");
 		}
 		
-		List<Device> devices = deviceService.findAll();
-		model.addAttribute("devices", devices);
+		model.addAttribute("devices", deviceService.findAll());
+		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "device/list";
 	}
@@ -150,6 +150,7 @@ public class DeviceController {
 		}
 		
 		model.addAttribute("devices", deviceService.findAll());
+		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "userDevices/grid";
 	}
@@ -160,17 +161,26 @@ public class DeviceController {
 	@RequestMapping(value = "/device/user/{id}", method = RequestMethod.GET)
 	public String showUserDevices(@PathVariable(value="id") int userId, Model model) {
 		
-		UserDetails loggedInUser = personService.getLoggedInUser();
+		UserDetails loggedInUserDetails = personService.getLoggedInUser();
 		Person requestedUser = personService.findById(userId);
-		if ( loggedInUser == null 
+		if ( loggedInUserDetails == null 
 				|| requestedUser == null 
-				|| loggedInUser.getUsername() == null 
-				|| !loggedInUser.getUsername().equals(requestedUser.getEmail()) ) {
+				|| loggedInUserDetails.getUsername() == null 
+				|| !loggedInUserDetails.getUsername().equals(requestedUser.getEmail()) ) {
 			throw new AccessDeniedException("");
 		}
 		
+		Person loggedInUser = personService.findByEmail(loggedInUserDetails.getUsername());
+		if (loggedInUser != null) {
+			if (loggedInUser.isAdmin()) {
+				model.addAttribute("rooms", roomService.findAll());
+			}
+			else {
+				model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
+			}
+		}
 		model.addAttribute("devices", deviceService.findByPersonsId(userId));
-    	model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+    	model.addAttribute("loggedInUser", loggedInUser);
 		return "userDevices/grid";
 	}
 	

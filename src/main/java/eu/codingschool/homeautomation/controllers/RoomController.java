@@ -33,15 +33,17 @@ public class RoomController {
 	private RoomValidator roomValidator;
 
 	@RequestMapping(value = "/room/list", method = RequestMethod.GET)
-	public String getRoomlist(Model model) {
+	public String getRooms(Model model) {
 		List<Room> room = roomService.findAll();
 		model.addAttribute("room", room);
 		
-		String email = new String();
+		String email = "";
         Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (userDetails instanceof UserDetails) {
             email = ((UserDetails)userDetails).getUsername();
         }
+        
+        model.addAttribute("rooms", roomService.findAll());
     	model.addAttribute("loggedInUser", personService.findByEmail(email));
 		return "room/list";
 	}

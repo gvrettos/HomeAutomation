@@ -18,4 +18,11 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     
     @Query("select r.devices from Room r where r.id = :id")
     Set<Device> findLocatedDevices(@Param("id") Integer id);
+    
+    @Query("select r " + 
+      	   "from Room r " + 
+      	   "join r.devices d " + 
+      	   "join d.persons p " + 
+      	   "where p.id = :id")
+     Set<Room> findUserRooms(@Param("id") Integer personId);
 }

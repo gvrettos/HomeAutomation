@@ -30,6 +30,11 @@ public class RoomServiceImpl implements RoomService {
 	public List<Room> findByName(String name) {
 		return roomRepository.findByName(name);
 	}
+	
+	@Override
+	public Set<Room> findByUser(Integer personId) {
+		return roomRepository.findUserRooms(personId);
+	}
 
 	@Override
 	public Room save(Room r) {
