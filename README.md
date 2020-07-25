@@ -19,13 +19,13 @@ The main functionalities provided are:
 
 # Screenshots
 Displaying all rooms where a simple user has access:
-![Alt text](01user-all_rooms.PNG "Displaying all rooms where a simple user has access")
+![Alt text](screenshots/01user-all_rooms.PNG "Displaying all rooms where a simple user has access")
 
 Displaying devices accessible to a simple user for a specific room:
-![Alt text](02user-specific_room.PNG "Displaying devices accessible to a simple user for a specific room")
+![Alt text](screenshots/02user-specific_room.PNG "Displaying devices accessible to a simple user for a specific room")
 
 Admin has access to the room details of the house:
-![Alt text](03admin-rooms-list.PNG "Admin has access to the room details of the house")
+![Alt text](screenshots/03admin-rooms-list.PNG "Admin has access to the room details of the house")
 
 Admin can control any device in any manner:
-![Alt text](04admin-device-list.PNG "Admin can control any device in any manner")
+![Alt text](screenshots/04admin-device-list.PNG "Admin can control any device in any manner")
