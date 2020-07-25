@@ -10,6 +10,7 @@ public interface DeviceService {
 	
 	List<Device> findAll();
 	Device findById(Integer id);
+	List<Device> findAllByRoomId(Integer roomId);
 	List<Device> findByName(String name);
 	List<Device> findByStatus(boolean statusOn);
     Set<Person> findUsersAssigned(Integer id);
@@ -20,5 +21,6 @@ public interface DeviceService {
 	void delete(Device d);
 	
 	List<Device> findByPersonsId(Integer id);
+	List<Device> findByPersonsIdAndRoomId(Integer userId, Integer roomId);
 	List<Device> getSelectedDevices(List<String> selectedDeviceIds);
 }

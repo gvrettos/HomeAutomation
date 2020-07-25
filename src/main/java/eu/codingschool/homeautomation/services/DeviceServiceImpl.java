@@ -26,6 +26,11 @@ public class DeviceServiceImpl implements DeviceService {
 	public Device findById(Integer id) {
 		return deviceRepository.findById(id).get();
 	}
+	
+	@Override
+	public List<Device> findAllByRoomId(Integer roomId) {
+		return deviceRepository.findByRoomId(roomId);
+	}
 
 	@Override
 	public List<Device> findByName(String name) {
@@ -60,6 +65,11 @@ public class DeviceServiceImpl implements DeviceService {
 	@Override
 	public List<Device> findByPersonsId(Integer id) {
 		return deviceRepository.findByPersonsId(id);
+	}
+	
+	@Override
+	public List<Device> findByPersonsIdAndRoomId(Integer userId, Integer roomId) {
+		return deviceRepository.findByPersonsIdAndRoomId(userId, roomId);
 	}
 	
 	@Override
