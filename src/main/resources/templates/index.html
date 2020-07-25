@@ -93,8 +93,20 @@
                             </a>
                             <div class="sidebar-submenu">
                                 <ul>
-									<li th:each="room : ${rooms}">
-										<a href="#" th:text="${room.getName()}">Room</a>
+									<li th:each="room : ${rooms}" 
+										th:switch="${loggedInUser.getRole()}">
+										<a href="#"
+										   th:case="ADMIN" 
+										   th:href="@{/admin/device/user/all/room/{roomId}(roomId=${room.getId()})}" 
+										   th:text="${room.getName()}">
+										   Room
+										</a>
+										<a href="#"
+										   th:case="USER" 
+										   th:href="@{/device/user/{userId}/room/{roomId}(userId=${loggedInUser.getId()}, roomId=${room.getId()})}" 
+										   th:text="${room.getName()}">
+										   Room
+										</a>
 									</li>
 						        </ul>
                             </div>

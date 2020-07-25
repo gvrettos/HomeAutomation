@@ -44,7 +44,7 @@ public class DeviceController {
 	
 	
 	@RequestMapping(value = "/admin/device/list", method = RequestMethod.GET)
-	public String getDevices(Model model) {
+	public String getAdminDevicesList(Model model) {
 		
 		UserDetails loggedInUser = personService.getLoggedInUser();
 		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
@@ -169,18 +169,51 @@ public class DeviceController {
 				|| !loggedInUserDetails.getUsername().equals(requestedUser.getEmail()) ) {
 			throw new AccessDeniedException("");
 		}
+    	
+    	populateSideMenu(model, loggedInUserDetails);
+    	model.addAttribute("devices", deviceService.findByPersonsId(userId));
+		return "userDevices/grid";
+	}
+	
+	/**
+	 * Display all the devices for a specific room
+	 */
+	@RequestMapping(value = "/admin/device/user/all/room/{roomId}", method = RequestMethod.GET)
+	public String showAdminDevicesPerRoom(@PathVariable(value="roomId") int roomId, Model model) {
 		
-		Person loggedInUser = personService.findByEmail(loggedInUserDetails.getUsername());
-		if (loggedInUser != null) {
-			if (loggedInUser.isAdmin()) {
-				model.addAttribute("rooms", roomService.findAll());
-			}
-			else {
-				model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
-			}
+		UserDetails loggedInUser = personService.getLoggedInUser();
+		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
+			throw new AccessDeniedException("");
 		}
-		model.addAttribute("devices", deviceService.findByPersonsId(userId));
-    	model.addAttribute("loggedInUser", loggedInUser);
+		
+		model.addAttribute("devices", deviceService.findAllByRoomId(roomId));
+		model.addAttribute("rooms", roomService.findAll());
+		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
+		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+		return "userDevices/grid";
+	}
+	
+	/**
+	 * Display the devices that are assigned to a USER for a specific room
+	 */
+	@RequestMapping(value = "/device/user/{userId}/room/{roomId}", method = RequestMethod.GET)
+	public String showUserDevicesPerRoom(
+			@PathVariable(value="userId") int userId, 
+			@PathVariable(value="roomId") int roomId, 
+			Model model) {
+		
+		UserDetails loggedInUserDetails = personService.getLoggedInUser();
+		Person requestedUser = personService.findById(userId);
+		if ( loggedInUserDetails == null 
+				|| requestedUser == null 
+				|| loggedInUserDetails.getUsername() == null 
+				|| !loggedInUserDetails.getUsername().equals(requestedUser.getEmail()) ) {
+			throw new AccessDeniedException("");
+		}
+		
+		populateSideMenu(model, loggedInUserDetails);
+		model.addAttribute("devices", deviceService.findByPersonsIdAndRoomId(userId, roomId));
+		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
 		return "userDevices/grid";
 	}
 	
@@ -238,6 +271,19 @@ public class DeviceController {
 			}
 		}
 		return null;
+	}
+	
+	private void populateSideMenu(Model model, UserDetails loggedInUserDetails) {
+		Person loggedInUser = personService.findByEmail(loggedInUserDetails.getUsername());
+		if (loggedInUser != null) {
+			if (loggedInUser.isAdmin()) {
+				model.addAttribute("rooms", roomService.findAll());
+			}
+			else {
+				model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
+			}
+		}
+		model.addAttribute("loggedInUser", loggedInUser);
 	}
 
 }

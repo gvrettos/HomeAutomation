@@ -12,7 +12,13 @@
 
 		<header>
 			<h5>
-				<b><i class="fas fa-tachometer-alt"></i> Using Devices</b>
+				<b>
+					<i class="fas fa-tachometer-alt"></i> 
+					Using Devices
+					<span th:if="${selectedRoom}">
+						<span>(</span><span th:text="${selectedRoom}"></span><span>)</span>
+					</span>
+				</b>
 			</h5>
 		</header>
 
