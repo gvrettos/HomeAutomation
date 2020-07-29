@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.codingschool.homeautomation.model.Device;
 import eu.codingschool.homeautomation.model.Room;
 import eu.codingschool.homeautomation.repositories.RoomRepository;
 
@@ -27,11 +26,6 @@ public class RoomServiceImpl implements RoomService {
 	}
 	
 	@Override
-	public List<Room> findByName(String name) {
-		return roomRepository.findByName(name);
-	}
-	
-	@Override
 	public Set<Room> findByUser(Integer personId) {
 		return roomRepository.findUserRooms(personId);
 	}
@@ -40,20 +34,9 @@ public class RoomServiceImpl implements RoomService {
 	public Room save(Room r) {
 		return roomRepository.save(r);
 	}
-	
-	@Override
-	public void delete(Integer id) {
-		roomRepository.deleteById(id);
-	}
 
 	@Override
 	public void delete(Room r) {
 		roomRepository.delete(r);
 	}
-	
-	@Override
-	public Set<Device> findLocatedDevices(Integer id) {
-		return roomRepository.findLocatedDevices(id);
-	}
-	
 }
