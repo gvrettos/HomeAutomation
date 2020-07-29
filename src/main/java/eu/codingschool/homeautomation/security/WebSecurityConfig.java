@@ -1,4 +1,4 @@
-package eu.codingschool.homeautomation.app;
+package eu.codingschool.homeautomation.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
