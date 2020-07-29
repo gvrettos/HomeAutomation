@@ -2,7 +2,6 @@ package eu.codingschool.homeautomation.services;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -36,28 +35,8 @@ public class PersonServiceImpl implements PersonService {
 	}
 	
 	@Override
-	public List<Person> findByName(String name) {
-		return personRepository.findByName(name);
-	}
-
-	@Override
-	public List<Person> findBySurname(String surname) {
-		return personRepository.findBySurname(surname);
-	}
-	
-	@Override
 	public Person findByEmail(String email) {
 		return personRepository.findByEmail(email);
-	}
-
-	@Override
-	public List<Person> findByRole(String role) {
-		return personRepository.findByRole(role);
-	}
-	
-	@Override
-	public Set<Device> findUserDevices(Integer personId) {
-		return personRepository.findUserDevices(personId);
 	}
 
 	@Override
@@ -78,11 +57,6 @@ public class PersonServiceImpl implements PersonService {
 		personDB.setEmail(personModel.getEmail());
 		personDB.setRole(personModel.getRole());
 		personDB.setDevices(new HashSet<>(selectedDevices));
-	}
-
-	@Override
-	public void delete(Integer id) {
-		personRepository.deleteById(id);
 	}
 
 	@Override

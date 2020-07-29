@@ -2,13 +2,11 @@ package eu.codingschool.homeautomation.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.codingschool.homeautomation.model.Device;
-import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.repositories.DeviceRepository;
 
 @Service
@@ -33,36 +31,6 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public List<Device> findByName(String name) {
-		return deviceRepository.findByName(name);
-	}
-
-	@Override
-	public List<Device> findByStatus(boolean statusOn) {
-		return deviceRepository.findByStatus(statusOn);
-	}
-
-	@Override
-	public Set<Person> findUsersAssigned(Integer id) {
-		return deviceRepository.findUsersAssigned(id);
-	}
-
-	@Override
-	public Device save(Device d) {
-		return deviceRepository.save(d);
-	}
-
-	@Override
-	public void delete(Integer id) {
-		deviceRepository.deleteById(id);
-	}
-
-	@Override
-	public void delete(Device d) {
-		deviceRepository.delete(d);
-	}
-
-	@Override
 	public List<Device> findByPersonsId(Integer id) {
 		return deviceRepository.findByPersonsId(id);
 	}
@@ -82,5 +50,15 @@ public class DeviceServiceImpl implements DeviceService {
 			}
 		}
 		return devices;
+	}
+	
+	@Override
+	public Device save(Device d) {
+		return deviceRepository.save(d);
+	}
+
+	@Override
+	public void delete(Device d) {
+		deviceRepository.delete(d);
 	}
 }
