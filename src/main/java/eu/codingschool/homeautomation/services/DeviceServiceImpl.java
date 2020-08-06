@@ -22,7 +22,7 @@ public class DeviceServiceImpl implements DeviceService {
 
 	@Override
 	public Device findById(Integer id) {
-		return deviceRepository.findById(id).get();
+		return deviceRepository.findById(id).orElse(null);
 	}
 	
 	@Override

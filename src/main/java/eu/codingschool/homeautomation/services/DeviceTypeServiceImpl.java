@@ -21,7 +21,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 	
 	@Override
 	public DeviceType findById(Integer id) {
-		return deviceTypeRepository.findById(id).get();
+		return deviceTypeRepository.findById(id).orElse(null);
 	}
 	
 	@Override
