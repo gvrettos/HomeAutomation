@@ -22,7 +22,7 @@ public class RoomServiceImpl implements RoomService {
 	
 	@Override
 	public Room findById(Integer id) {
-		return roomRepository.findById(id).get();
+		return roomRepository.findById(id).orElse(null);
 	}
 	
 	@Override

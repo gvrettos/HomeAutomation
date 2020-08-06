@@ -31,7 +31,7 @@ public class PersonServiceImpl implements PersonService {
 	
 	@Override
 	public Person findById(Integer id) {
-		return personRepository.findById(id).get();
+		return personRepository.findById(id).orElse(null);
 	}
 	
 	@Override
@@ -51,12 +51,14 @@ public class PersonServiceImpl implements PersonService {
 	@Override
 	@Transactional
 	public void update(Person personModel, List<Device> selectedDevices) {
-		Person personDB = findById(personModel.getId());
-		personDB.setName(personModel.getName());
-		personDB.setSurname(personModel.getSurname());
-		personDB.setEmail(personModel.getEmail());
-		personDB.setRole(personModel.getRole());
-		personDB.setDevices(new HashSet<>(selectedDevices));
+		if (personModel != null) {
+			Person personDB = findById(personModel.getId());
+			personDB.setName(personModel.getName());
+			personDB.setSurname(personModel.getSurname());
+			personDB.setEmail(personModel.getEmail());
+			personDB.setRole(personModel.getRole());
+			personDB.setDevices(new HashSet<>(selectedDevices));
+		}
 	}
 
 	@Override
