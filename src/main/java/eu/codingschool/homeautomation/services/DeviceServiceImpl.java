@@ -43,10 +43,14 @@ public class DeviceServiceImpl implements DeviceService {
 	@Override
 	public List<Device> getSelectedDevices(List<String> selectedDeviceIds) {
 		List<Device> devices = new ArrayList<>();
+		Device deviceToAdd;
 		if (selectedDeviceIds != null) {
 			for (String deviceIdStr : selectedDeviceIds) {
 				int deviceId = Integer.parseInt(deviceIdStr);
-				devices.add(findById(deviceId));
+				deviceToAdd = findById(deviceId);
+				if (deviceToAdd != null) {
+					devices.add(deviceToAdd);
+				}
 			}
 		}
 		return devices;
