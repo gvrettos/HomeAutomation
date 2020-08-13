@@ -1,6 +1,7 @@
 package eu.codingschool.homeautomation.controllers;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -64,7 +65,7 @@ public class DeviceController {
 	public String newDevice(Model model) {
 		model.addAttribute("device", new Device());
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
-		List<Room> allRooms = roomService.findAll();
+		Set<Room> allRooms = roomService.findAll();
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
 		model.addAttribute("actionUrl", "/admin/device/new");
@@ -88,7 +89,7 @@ public class DeviceController {
 	public String viewDevice(@PathVariable(value="id") int id, Model model) {
 		Device device = deviceService.findById(id);
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
-		List<Room> allRooms = roomService.findAll();
+		Set<Room> allRooms = roomService.findAll();
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
 		model.addAttribute("device", device);

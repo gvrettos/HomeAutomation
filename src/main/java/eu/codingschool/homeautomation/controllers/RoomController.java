@@ -1,6 +1,6 @@
 package eu.codingschool.homeautomation.controllers;
 
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +34,7 @@ public class RoomController {
 
 	@RequestMapping(value = "/room/list", method = RequestMethod.GET)
 	public String getRooms(Model model) {
-		List<Room> room = roomService.findAll();
+		Set<Room> room = roomService.findAll();
 		model.addAttribute("room", room);
 		
 		String email = "";

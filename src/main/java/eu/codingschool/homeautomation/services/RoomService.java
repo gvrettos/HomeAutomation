@@ -1,13 +1,12 @@
 package eu.codingschool.homeautomation.services;
 
-import java.util.List;
 import java.util.Set;
 
 import eu.codingschool.homeautomation.model.Room;
 
 public interface RoomService {
 	
-	List<Room> findAll();
+	Set<Room> findAll();
 	
 	Room findById(Integer id);
 	
