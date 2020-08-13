@@ -1,6 +1,6 @@
 package eu.codingschool.homeautomation.services;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,8 @@ public class RoomServiceImpl implements RoomService {
 	RoomRepository roomRepository;
 
 	@Override
-	public List<Room> findAll() {
-		return roomRepository.findAll();
+	public Set<Room> findAll() {
+		return new HashSet<>(roomRepository.findAll());
 	}
 	
 	@Override

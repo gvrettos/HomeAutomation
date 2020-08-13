@@ -83,7 +83,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findAll()).thenReturn(roomsSaved);
 		
 		// when
-		List<Room> roomsFound = roomService.findAll();
+		Set<Room> roomsFound = roomService.findAll();
 		
 		// then
 		assertNotNull(roomsFound);
@@ -96,7 +96,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findAll()).thenReturn(Arrays.asList());
 		
 		// when
-		List<Room> rooms = roomService.findAll();
+		Set<Room> rooms = roomService.findAll();
 		
 		// then
 		assertNotNull(rooms);
