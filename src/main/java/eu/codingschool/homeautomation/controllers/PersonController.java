@@ -46,8 +46,7 @@ public class PersonController {
 			throw new AccessDeniedException("");
 		}
 		
-		List<Person> people = personService.findAll();
-		model.addAttribute("people", people);
+		model.addAttribute("people", personService.findAll());
 		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
 		return "person/list";
@@ -58,14 +57,11 @@ public class PersonController {
 	 */
 	@RequestMapping(value = "/person/{id}/edit", method = RequestMethod.GET)
 	public String viewPerson(@PathVariable("id") int id, Model model) {
-		Person person = personService.findById(id);
-		List<Device> devices = deviceService.findAll();
-		List<Device> personDevices = deviceService.findByPersonsId(id);
-		model.addAttribute("personDevices", personDevices);
-		model.addAttribute("devices", devices);
+		model.addAttribute("personDevices", deviceService.findByPersonsId(id));
+		model.addAttribute("devices", deviceService.findAll());
 		model.addAttribute("actionUrl", "/admin/person/" + id + "/edit");
 		model.addAttribute("modalTitle", "Edit");
-		model.addAttribute("person", person);
+		model.addAttribute("person", personService.findById(id));
 		return "person/modals :: modalNewOrEdit";
 	}
 
@@ -115,6 +111,9 @@ public class PersonController {
 	@RequestMapping(value = "/person/{id}/delete", method = RequestMethod.POST)
 	public String doDeletePerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
+		if (person == null) {
+			return "redirect:/error/404";
+		}
 		person.removeAllDevices();
 		personService.delete(person);
 		return "redirect:/admin/person/list";
