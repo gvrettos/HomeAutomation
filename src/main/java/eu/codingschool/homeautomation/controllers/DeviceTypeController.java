@@ -1,8 +1,8 @@
 package eu.codingschool.homeautomation.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.codingschool.homeautomation.model.DeviceType;
 import eu.codingschool.homeautomation.services.DeviceTypeService;
+import eu.codingschool.homeautomation.services.PersonService;
 import eu.codingschool.homeautomation.validators.DeviceTypeValidator;
 
 @Controller
@@ -24,13 +25,22 @@ public class DeviceTypeController {
 	private DeviceTypeService deviceTypeService;
 	
 	@Autowired
+	private PersonService personService;
+	
+	@Autowired
 	private DeviceTypeValidator deviceTypeValidator;
 	
 	
 	@RequestMapping(value = "/deviceType/list", method = RequestMethod.GET)
 	public String getDeviceTypes(Model model) {
-		List<DeviceType> deviceTypes = deviceTypeService.findAll();
-		model.addAttribute("deviceTypes", deviceTypes);
+		String email = "";
+        Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (userDetails instanceof UserDetails) {
+            email = ((UserDetails)userDetails).getUsername();
+        }
+        
+		model.addAttribute("deviceTypes", deviceTypeService.findAll());
+		model.addAttribute("loggedInUser", personService.findByEmail(email));
 		return "deviceType/list";
 	}
 	

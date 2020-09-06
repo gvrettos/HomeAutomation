@@ -2,14 +2,13 @@ package eu.codingschool.homeautomation;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan("eu.codingschool.homeautomation.model")
-@ComponentScan(basePackages = "eu.codingschool.homeautomation")
-@EnableJpaRepositories("eu.codingschool.homeautomation.repositories")
+// Having the main class inside the root package requires only @SpringBootApplication to work
+// Having @ComponentScan, @EnableJpaRepositories confuses @WebMvcTest testing
+//@EntityScan("eu.codingschool.homeautomation.model")
+//@ComponentScan(basePackages = "eu.codingschool.homeautomation")
+//@EnableJpaRepositories("eu.codingschool.homeautomation.repositories")
 public class HomeAutomationApplication {
 
 	public static void main(String[] args) {

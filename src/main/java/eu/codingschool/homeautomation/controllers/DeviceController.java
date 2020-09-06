@@ -46,15 +46,7 @@ public class DeviceController {
 	
 	@RequestMapping(value = "/admin/device/list", method = RequestMethod.GET)
 	public String getAdminDevicesList(Model model) {
-		
-		UserDetails loggedInUser = personService.getLoggedInUser();
-		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
-			throw new AccessDeniedException("");
-		}
-		
-		model.addAttribute("devices", deviceService.findAll());
-		model.addAttribute("rooms", roomService.findAll());
-		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+		getAllDevices(model);
 		return "device/list";
 	}
 	
@@ -139,12 +131,7 @@ public class DeviceController {
 		return "redirect:/admin/device/list";
 	}
 	
-	/**
-	 * Display the devices that can be operated by an ADMIN
-	 */
-	@RequestMapping(value = "/admin/device/user/all", method = RequestMethod.GET)
-	public String showAdminDevices(Model model) {
-		
+	private void getAllDevices(Model model) {
 		UserDetails loggedInUser = personService.getLoggedInUser();
 		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
 			throw new AccessDeniedException("");
@@ -153,6 +140,14 @@ public class DeviceController {
 		model.addAttribute("devices", deviceService.findAll());
 		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+	}
+	
+	/**
+	 * Display the devices that can be operated by an ADMIN
+	 */
+	@RequestMapping(value = "/admin/device/user/all", method = RequestMethod.GET)
+	public String showAdminDevices(Model model) {
+		getAllDevices(model);
 		return "userDevices/grid";
 	}
 	
@@ -230,20 +225,7 @@ public class DeviceController {
 		device.setStatusOn(status);
 		deviceService.save(device);
 		
-		// redirect according to the logged in user
-		UserDetails loggedInUser = personService.getLoggedInUser();
-		if (loggedInUser != null && loggedInUser.getUsername() != null) {
-			Person loggedInPerson = personService.findByEmail(loggedInUser.getUsername());
-			if (loggedInPerson != null) {
-				if ("ADMIN".equals(loggedInPerson.getRole())) {
-					return "redirect:/admin/device/user/all";
-				}
-				else if ("USER".equals(loggedInPerson.getRole())) {
-					return "redirect:/device/user/" + loggedInPerson.getId();
-				}
-			}
-		}
-		return null;
+		return redirectPage();
 	}
 	
 	/**
@@ -258,7 +240,20 @@ public class DeviceController {
 		device.setInformationValue(informationValue);
 		deviceService.save(device);
 		
-		// redirect according to the logged in user
+		return redirectPage();
+	}
+	
+	private void populateSideMenu(Model model, UserDetails loggedInUserDetails) {
+		Person loggedInUser = personService.findByEmail(loggedInUserDetails.getUsername());
+		if (loggedInUser != null) {
+			model.addAttribute(
+					"rooms", 
+					loggedInUser.isAdmin() ? roomService.findAll() : roomService.findByUser(loggedInUser.getId()));
+		}
+		model.addAttribute("loggedInUser", loggedInUser);
+	}
+	
+	private String redirectPage() {
 		UserDetails loggedInUser = personService.getLoggedInUser();
 		if (loggedInUser != null && loggedInUser.getUsername() != null) {
 			Person loggedInPerson = personService.findByEmail(loggedInUser.getUsername());
@@ -272,19 +267,6 @@ public class DeviceController {
 			}
 		}
 		return null;
-	}
-	
-	private void populateSideMenu(Model model, UserDetails loggedInUserDetails) {
-		Person loggedInUser = personService.findByEmail(loggedInUserDetails.getUsername());
-		if (loggedInUser != null) {
-			if (loggedInUser.isAdmin()) {
-				model.addAttribute("rooms", roomService.findAll());
-			}
-			else {
-				model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
-			}
-		}
-		model.addAttribute("loggedInUser", loggedInUser);
 	}
 
 }
