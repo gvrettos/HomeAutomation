@@ -3,6 +3,7 @@ package eu.codingschool.homeautomation.controllers;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -103,8 +104,15 @@ public class RoomController {
 	 */
 	@RequestMapping(value = "/room/{id}/delete", method = RequestMethod.POST)
 	public String doDeleteRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
-		// TODO check for foreign constraints - Room may be already used by a device
-		roomService.delete(room);
+		try {
+			room = roomService.findById(room.getId());
+			roomService.delete(room);
+		} catch (DataIntegrityViolationException ex) {
+			model.addAttribute("action", "delete room");
+			model.addAttribute("entityName", room.getName());
+			model.addAttribute("additionalMessage", "Please check if there are any assigned devices to this room. Only free rooms can be deleted.");
+			return "/error/422";
+		}
 		return "redirect:/admin/room/list";
 	}
 

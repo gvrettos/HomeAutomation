@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>422 - Unprocessable Entity</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+	<h2>422 - Unprocessable Entity</h2>
+	<p>
+		Failed to <span th:text="${action}"></span> "<span th:text="${entityName}"></span>". 
+		<br/><br/>
+		<span th:text="${additionalMessage}"></span>
+	</p>
+  </body>
+</html>

@@ -15,7 +15,7 @@
 					class="form-horizontal" role="form">
 					<fieldset>
 					<div class="modal-header">
-						<h5 class="modal-title" id="modalNewOrEditLabel"><span th:text="${modalTitle}"></span> Device</h5>
+						<h5 class="modal-title" id="modalNewOrEditLabel"><span th:text="${modalTitle}"></span> User</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -39,7 +39,7 @@
 						<!-- Text input-->
 						<div class="form-group">
 							<label for="email" class="col-form-label">Email:</label> 
-							<input type="text" class="form-control" th:field="*{email}" required />
+							<input type="email" class="form-control" th:field="*{email}" required />
 							<span th:if="${#fields.hasErrors('email')}" th:errors="*{email}">..</span>
 						</div>
 						

@@ -16,7 +16,7 @@
 			<div id="modalHolder"></div>
 			
 			<p>
-				<a href="#" th:href="@{/deviceType/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
+				<a href="#" th:href="@{/admin/deviceType/new}" class="btn btn-primary btn-xs pull-right btnNew"> 
 					<b>+</b> Add new Device Type
 				</a>
 			</p>
@@ -38,11 +38,11 @@
 						<td th:text="${deviceType.getInformationType()}">Information Type</td>
 						<td class="text-center">
 							<a class="btn btn-info btn-xs btnEdit" href="#"
-							   th:href="@{/deviceType/{id}/edit(id=${deviceType.getId()})}">  
+							   th:href="@{/admin/deviceType/{id}/edit(id=${deviceType.getId()})}">  
 							   <span class="fa fa-edit"></span> Edit
 							</a> 
 							<a class="btn btn-danger btn-xs btnDelete" href="#"
-							   th:href="@{/deviceType/{id}/delete(id=${deviceType.getId()})}"> 
+							   th:href="@{/admin/deviceType/{id}/delete(id=${deviceType.getId()})}"> 
 							   <span class="fas fa-times"></span> Delete
 							</a>
 						</td>

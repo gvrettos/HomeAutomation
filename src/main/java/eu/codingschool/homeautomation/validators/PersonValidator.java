@@ -20,18 +20,18 @@ public class PersonValidator implements Validator {
 		Person person = (Person) o;
 
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty");
-		if (person.getName().length() < 3 || person.getName().length() > 32) {
+		if (person.getName() != null && (person.getName().length() < 3 || person.getName().length() > 32)) {
 			errors.rejectValue("name", "Size");
 		}
 
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "surname", "NotEmpty");
-		if (person.getSurname().length() < 3 || person.getSurname().length() > 32) {
+		if (person.getSurname() != null && (person.getSurname().length() < 3 || person.getSurname().length() > 32)) {
 			errors.rejectValue("surname", "Size");
 		}
 
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "Wrong email format");
-		if (!person.getEmail().contains("@")) {
-			errors.rejectValue("email", "Size");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "NotEmpty");
+		if (person.getEmail() != null && !person.getEmail().contains("@")) {
+			errors.rejectValue("email", "Format");
 		}
 	}
 }
