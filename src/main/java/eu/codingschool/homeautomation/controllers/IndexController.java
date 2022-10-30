@@ -82,5 +82,10 @@ public class IndexController {
 	public String error403(Model model) {
 		return "error/403";
 	}
+	
+	@RequestMapping(value = "/error/422", method = RequestMethod.GET)
+	public String error422(Model model) {
+		return "error/422";
+	}
 
 }

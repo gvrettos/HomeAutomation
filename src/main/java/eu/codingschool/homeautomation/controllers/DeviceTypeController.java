@@ -1,6 +1,7 @@
 package eu.codingschool.homeautomation.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -50,7 +51,7 @@ public class DeviceTypeController {
 	@RequestMapping(value = "/deviceType/new", method = RequestMethod.GET)
 	public String newDeviceType(Model model) {
 		model.addAttribute("deviceType", new DeviceType());
-		model.addAttribute("actionUrl", "/deviceType/new");
+		model.addAttribute("actionUrl", "/admin/deviceType/new");
 		model.addAttribute("modalTitle", "New");
 		return "deviceType/modals :: modalNewOrEdit";
 	}
@@ -71,7 +72,7 @@ public class DeviceTypeController {
 	public String viewDeviceType(@PathVariable(value="id") int id, Model model) {
 		DeviceType deviceType = deviceTypeService.findById(id);
 		model.addAttribute("deviceType", deviceType);
-		model.addAttribute("actionUrl", "/deviceType/" + id + "/edit");
+		model.addAttribute("actionUrl", "/admin/deviceType/" + id + "/edit");
 		model.addAttribute("modalTitle", "Edit");
 		return "deviceType/modals :: modalNewOrEdit";
 	}
@@ -92,7 +93,7 @@ public class DeviceTypeController {
 	public String confrimDeleteDeviceType(@PathVariable(value="id") int id, Model model) {
 		DeviceType deviceType = deviceTypeService.findById(id);
 		model.addAttribute("deviceType", deviceType);
-		model.addAttribute("actionUrl", "/deviceType/" + id + "/delete");
+		model.addAttribute("actionUrl", "/admin/deviceType/" + id + "/delete");
 		return "deviceType/modals :: modalDelete";
 	}
 	
@@ -100,10 +101,19 @@ public class DeviceTypeController {
 	 * Delete the device type after accepting the deletion confirmation.
 	 */
 	@RequestMapping(value = "/deviceType/{id}/delete", method = RequestMethod.POST)
-	public String doDeleteDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, 
-			ModelMap model) {
-		deviceTypeService.delete(deviceType);
-		return "redirect:/deviceType/list";
+	public String doDeleteDeviceType(
+			@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, ModelMap model) {
+		
+		try {
+			deviceType = deviceTypeService.findById(deviceType.getId());
+			deviceTypeService.delete(deviceType);
+		} catch (DataIntegrityViolationException ex) {
+			model.addAttribute("action", "delete device type");
+			model.addAttribute("entityName", deviceType.getType());
+			model.addAttribute("additionalMessage", "Please check if the device type is used by any device. Only unused device types can be deleted.");
+			return "/error/422";
+		}
+		return "redirect:/admin/deviceType/list";
 	}
 	
 	private String saveOrUpdateDeviceType(DeviceType deviceType, BindingResult result) {
@@ -115,6 +125,6 @@ public class DeviceTypeController {
 		}
 		
 		deviceTypeService.save(deviceType);
-		return "redirect:/deviceType/list";
+		return "redirect:/admin/deviceType/list";
 	}
 }

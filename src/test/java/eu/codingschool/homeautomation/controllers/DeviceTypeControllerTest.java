@@ -99,7 +99,7 @@ public class DeviceTypeControllerTest {
 	@WithMockUser
 	public void addDeviceType_Should_SaveDeviceType_When_Provided() throws Exception {
 		// when - then
-		performHttpPostAction("new", -1, "/deviceType/list");
+		performHttpPostAction("new", -1, "/admin/deviceType/list");
 		
 		verify(deviceTypeService, times(1)).save(any());
 	}
@@ -145,7 +145,7 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 2;
 				
 		// when - then
-		performHttpPostAction("edit", deviceTypeId, "/deviceType/list");
+		performHttpPostAction("edit", deviceTypeId, "/admin/deviceType/list");
 		
 		verify(deviceTypeService, times(1)).save(any());
 	}
@@ -189,7 +189,7 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 2;
 				
 		// when - then
-		performHttpPostAction("delete", deviceTypeId, "/deviceType/list");
+		performHttpPostAction("delete", deviceTypeId, "/admin/deviceType/list");
 		
 		verify(deviceTypeService, times(1)).delete(any());
 	}
@@ -201,7 +201,7 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 3; // this room does not exist
 				
 		// when - then
-		performHttpPostAction("delete", deviceTypeId, "/deviceType/list");
+		performHttpPostAction("delete", deviceTypeId, "/admin/deviceType/list");
 		
 		verify(deviceTypeService, times(1)).delete(any());
 	}

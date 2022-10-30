@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -113,9 +114,16 @@ public class DeviceController {
 	 * Delete the device type after accepting the deletion confirmation.
 	 */
 	@RequestMapping(value = "/admin/device/{id}/delete", method = RequestMethod.POST)
-	public String doDeleteDevice(@ModelAttribute("device") Device device, BindingResult result, 
-			ModelMap model) {
-		deviceService.delete(device);
+	public String doDeleteDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
+		try {
+			device = deviceService.findById(device.getId());
+			deviceService.delete(device);
+		} catch (DataIntegrityViolationException ex) {
+			model.addAttribute("action", "delete device");
+			model.addAttribute("entityName", device.getName());
+			model.addAttribute("additionalMessage", "Please check if the device has been assigned to any user. Only unassigned devices can be deleted.");
+			return "/error/422";
+		}
 		return "redirect:/admin/device/list";
 	}
 	
@@ -216,6 +224,7 @@ public class DeviceController {
 	/**
 	 * Set the device on/off.
 	 */
+	// FIXME A simple user can update a device which is assigned to another user and not them!
 	@RequestMapping(value = "/device/{id}/updateStatus/{status}", method = RequestMethod.POST)
 	public String updateDeviceStatus(
 			@PathVariable(value="id") int deviceId, 
@@ -231,6 +240,7 @@ public class DeviceController {
 	/**
 	 * Increase/Decrease the device's information value. 
 	 */
+	// FIXME A simple user can update a device which is assigned to another user and not them!
 	@RequestMapping(value = "/device/{id}/updateValue/{value}", method = RequestMethod.POST)
 	public String updateDeviceInformationValue(
 			@PathVariable(value="id") int deviceId, 

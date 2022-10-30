@@ -57,8 +57,14 @@
                             </a>
                         </li>
                         <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
-                            <a href="#" th:href="@{/admin/device/list}">
+                            <a href="#" th:href="@{/admin/deviceType/list}">
                                 <i class="fa fa-cogs"></i>
+                                <span>Device Types</span>
+                            </a>
+                        </li>
+                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
+                            <a href="#" th:href="@{/admin/device/list}">
+                                <i class="fa fa-tv"></i>
                                 <span>Devices</span>
                             </a>
                         </li>
