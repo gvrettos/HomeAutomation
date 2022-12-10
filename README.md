@@ -29,3 +29,35 @@ Admin has access to the room details of the house:
 
 Admin can control any device in any manner:
 ![Alt text](screenshots/04admin-device-list.PNG "Admin can control any device in any manner")
+
+# Prerequisites
+* Java 8 (JDK) installation
+* Spring Boot 2.0.1.RELEASE
+* MySQL (5.7.21 was used) 
+* Maven (3.5.3 was used)
+
+# Build and Test the application
+1. Open `application.properties` and verify that any placeholders are substituted with actual values
+2. Open any terminal or command line prompt
+3. Navigate to the provided project folder `HomeAutomation`
+4. Run
+	`mvn clean install`
+	
+	This will download any necessary artifacts from maven central repository, build the project and run the whole unit test suite and install the application in the local maven repository.
+	
+5. Alternatively, run
+	`mvn clean test`
+	
+	This will skip installing the application in the local maven repository.
+
+# Run the application
+1. Open a new terminal or command line prompt
+2. Navigate to the provided project folder `HomeAutomation`
+3. Run
+	`mvn spring-boot:run`
+	
+	This will deploy the application and start the Web Application server.
+	
+4. Access application through browser:
+
+	http://localhost:8080/homeAutomation/
