@@ -27,7 +27,7 @@ public class Device {
 	private String name;
 
 	/**
-	 * This will be either ON or OFF.
+	 * This will be saved in the database as either 1 (on) or 0 (off).
 	 */
 	@Column(name = "status")
 	@Type(type="numeric_boolean")
