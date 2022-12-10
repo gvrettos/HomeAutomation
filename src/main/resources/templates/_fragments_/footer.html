@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<div th:fragment="footer">
+	
+		<!-- Bootstrap 4.1 core JavaScript -->
+		<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}"></script>
+	    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	
+	    <!-- Custom scripts for this template -->
+		<script src="../static/js/custom.js" th:src="@{/js/custom.js}"></script>
+	    <script src="../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
+	    <script src="../static/js/plus-minus.js" th:src="@{/js/plus-minus.js}"></script>
+	    <script src="../static/js/switch.js" th:src="@{/js/switch.js}"></script>
+		
+	
+		<th:block layout:fragment="scripts"></th:block>
+	</div>
+</html>

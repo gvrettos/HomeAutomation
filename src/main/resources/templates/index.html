@@ -1,129 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-
-<head th:fragment="head">
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Home Automation</title>
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
-
-    <!-- Custom fonts for this template -->
-    <link href="vendor/font-awesome/css/fontawesome-all.min.css" th:href="@{/vendor/font-awesome/css/fontawesome-all.min.css}" rel="stylesheet">
-    <link href="vendor/devicons/css/devicons.min.css" th:href="@{/vendor/devicons/css/devicons.min.css}" rel="stylesheet">
-    <link href="vendor/simple-line-icons/css/simple-line-icons.css" th:href="@{/vendor/simple-line-icons/css/simple-line-icons.css}" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="css/custom.css" th:href="@{/css/custom.css}" rel="stylesheet">
-    <link href="css/sidebar.css" th:href="@{/css/sidebar.css}" rel="stylesheet">
-    <!-- https://bootsnipp.com/snippets/GaxR2 -->
-    <link href="css/switch.css" th:href="@{/css/switch.css}" rel="stylesheet">
-
-</head>
-
+<head th:replace="_fragments_/header :: head"></head>
 <body>
     <div class="page-wrapper chiller-theme toggled">
         <nav id="sidebar" class="sidebar-wrapper">
             <div class="sidebar-content">
             
-                <div class="sidebar-header">
-                    <div class="user-info">
-                        <span class="user-name">
-                            <span th:text="${loggedInUser.getName()}"></span>
-                            <strong th:text="${loggedInUser.getSurname()}">Anonymous</strong>
-                            <a href="/homeAutomation/logout">
-                                <i class="fa fa-power-off"></i>
-                            </a>
-                        </span>
-                        <span class="user-role" th:if="${loggedInUser.getRole() == 'ADMIN'}">Administrator</span>
-                    </div>
-                </div>
-                <!-- sidebar-header end -->
+                <div th:replace="_fragments_/menuHeader :: sidebar-header"></div>
                 
-                <div class="sidebar-menu">
-                    <ul>
-                        <li class="header-menu" 
-                        	th:if="${loggedInUser.getRole() == 'ADMIN'}">
-                            <span>System Management</span>
-                        </li>
-                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
-                            <a href="#" th:href="@{/admin/person/list}">
-                                <i class="fa fa-user"></i>
-                                <span>Users</span>
-                            </a>
-                        </li>
-                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
-                            <a href="#" th:href="@{/admin/deviceType/list}">
-                                <i class="fa fa-cogs"></i>
-                                <span>Device Types</span>
-                            </a>
-                        </li>
-                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
-                            <a href="#" th:href="@{/admin/device/list}">
-                                <i class="fa fa-tv"></i>
-                                <span>Devices</span>
-                            </a>
-                        </li>
-                        <li th:if="${loggedInUser.getRole() == 'ADMIN'}">
-                            <a href="#" th:href="@{/admin/room/list}">
-                                <i class="fa fa-bed"></i>
-                                <span>Rooms</span>
-                            </a>
-                        </li>
-                        
-                        <li class="header-menu">
-                            <span>Devices Management</span>
-                        </li>
-                        <li th:switch="${loggedInUser.getRole()}">
-                            <a href="#" 
-                               th:case="ADMIN" 
-                               th:href="@{/admin/device/user/all}">
-                               <i class="fa fa-cogs"></i>
-                                <span>All rooms</span>
-                            </a>
-                            <a href="#" 
-                               th:case="USER" 
-                               th:href="@{/device/user/{id}(id=${loggedInUser.getId()})}">
-                                <i class="fa fa-cogs"></i>
-                                <span>All rooms</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-dropdown">
-                            <a href="#">
-                                <i class="fa fa-bed"></i>
-                                <span>Specific rooms</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-									<li th:each="room : ${rooms}" 
-										th:switch="${loggedInUser.getRole()}">
-										<a href="#"
-										   th:case="ADMIN" 
-										   th:href="@{/admin/device/user/all/room/{roomId}(roomId=${room.getId()})}" 
-										   th:text="${room.getName()}">
-										   Room
-										</a>
-										<a href="#"
-										   th:case="USER" 
-										   th:href="@{/device/user/{userId}/room/{roomId}(userId=${loggedInUser.getId()}, roomId=${room.getId()})}" 
-										   th:text="${room.getName()}">
-										   Room
-										</a>
-									</li>
-						        </ul>
-                            </div>
-                        </li>
-                    </ul>
+                <div th:switch="${loggedInUser.getRole()}" class="sidebar-menu">
+                	<div th:case="ADMIN">
+                		<div th:replace="_fragments_/menuAdmin :: sidebar-menu"></div>
+                	</div>
+                	<div th:case="USER">
+                		<div th:replace="_fragments_/menuUser :: sidebar-menu"></div>
+                	</div>
                 </div>
-                <!-- sidebar-menu end -->
+                
             </div>
         </nav>
-        <!-- sidebar-wrapper end -->
-        
 
         <main class="page-content">
             <div class="container-fluid">
@@ -133,22 +28,8 @@
             </div>
         </main>
     </div>
-
-
-	<!-- Bootstrap 4.1 core JavaScript -->
-	<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-    <!-- Custom scripts for this template -->
-    <!-- <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script> -->
-	<script src="../static/js/custom.js" th:src="@{/js/custom.js}"></script>
-    <script src="../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
-    <script src="../static/js/plus-minus.js" th:src="@{/js/plus-minus.js}"></script>
-    <script src="../static/js/switch.js" th:src="@{/js/switch.js}"></script>
 	
-
-	<th:block layout:fragment="scripts"></th:block>
-
+	<div th:replace="_fragments_/footer :: footer"></div>
 </body>
 
 </html>

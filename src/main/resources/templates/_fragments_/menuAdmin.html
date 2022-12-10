@@ -1,0 +1,56 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<div th:fragment="sidebar-menu">
+		<ul>
+			<li class="header-menu">
+				<span>System Management</span>
+			</li>
+			<li>
+				<a href="#" th:href="@{/admin/person/list}"> 
+					<i class="fa fa-user"></i> <span>Users</span>
+				</a>
+			</li>
+			<li>
+				<a href="#" th:href="@{/admin/deviceType/list}"> 
+					<i class="fa fa-cogs"></i> <span>Device Types</span>
+				</a>
+			</li>
+			<li>
+				<a href="#" th:href="@{/admin/device/list}"> 
+					<i class="fa fa-tv"></i> <span>Devices</span>
+				</a>
+			</li>
+			<li>
+				<a href="#" th:href="@{/admin/room/list}"> 
+					<i class="fa fa-bed"></i> <span>Rooms</span>
+				</a>
+			</li>
+
+			<li class="header-menu">
+				<span>Devices Management</span>
+			</li>
+			<li>
+				<a href="#" th:href="@{/admin/device/user/all}"> 
+					<i class="fa fa-cogs"></i> <span>All rooms</span>
+				</a>
+			</li>
+			<li class="sidebar-dropdown">
+				<a href="#"> 
+					<i class="fa fa-bed"></i> <span>Specific rooms</span>
+				</a>
+				<div class="sidebar-submenu">
+					<ul>
+						<li th:each="room : ${rooms}">
+							<a href="#" 
+							   th:href="@{/admin/device/user/all/room/{roomId}(roomId=${room.getId()})}" 
+							   th:text="${room.getName()}"> 
+							   Room 
+							</a>
+						</li>
+					</ul>
+				</div>
+			</li>
+		</ul>
+	</div>
+</body>
+</html>

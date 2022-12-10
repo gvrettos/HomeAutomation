@@ -1,0 +1,16 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	<body>
+		<div th:fragment="sidebar-header" class="sidebar-header">
+			<div class="user-info">
+				<span class="user-name">
+					<span th:text="${loggedInUser.getName()}"></span>
+					<strong th:text="${loggedInUser.getSurname()}">Anonymous</strong>
+	                <a href="/homeAutomation/logout">
+	                	<i class="fa fa-power-off"></i>
+	                </a>
+	            </span>
+	            <span class="user-role" th:if="${loggedInUser.getRole() == 'ADMIN'}">Administrator</span>
+	        </div>
+	    </div>
+	</body>
+</html>
