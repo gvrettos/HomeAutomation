@@ -10,10 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import eu.codingschool.homeautomation.model.Room;
 import eu.codingschool.homeautomation.services.PersonService;
@@ -24,6 +21,15 @@ import eu.codingschool.homeautomation.validators.RoomValidator;
 @RequestMapping("/admin")
 public class RoomController {
 
+	private static final String ENDPOINT_ROOMS_BASE_URL = "/rooms";
+	private static final String ENDPOINT_ADMIN_ROOMS_BASE_URL = "/admin" + ENDPOINT_ROOMS_BASE_URL;
+	private static final String REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL = "redirect:" + ENDPOINT_ADMIN_ROOMS_BASE_URL;
+
+	private static final String MODAL_ROOM_NEW_OR_EDIT = "room/modals :: modalNewOrEdit";
+	private static final String MODAL_ROOM_DELETE = "room/modals :: modalDelete";
+
+	private static final String VIEW_ROOM_LIST = "room/list";
+
 	@Autowired
 	private RoomService roomService;
 	
@@ -33,7 +39,7 @@ public class RoomController {
 	@Autowired
 	private RoomValidator roomValidator;
 
-	@RequestMapping(value = "/room/list", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_ROOMS_BASE_URL)
 	public String getRooms(Model model) {
 		Set<Room> room = roomService.findAll();
 		model.addAttribute("room", room);
@@ -46,24 +52,25 @@ public class RoomController {
         
         model.addAttribute("rooms", roomService.findAll());
     	model.addAttribute("loggedInUser", personService.findByEmail(email));
-		return "room/list";
+		return VIEW_ROOM_LIST;
 	}
 
 	/**
 	 * Display form for new room with empty fields.
 	 */
-	@RequestMapping(value = "/room/new", method = RequestMethod.GET)
+	@PostMapping(value = ENDPOINT_ROOMS_BASE_URL + "/form")
 	public String newRoom(Model model) {
 		model.addAttribute("room", new Room());
-		model.addAttribute("actionUrl", "/admin/room/new");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_ROOMS_BASE_URL);
+		model.addAttribute("actionType", "POST");
 		model.addAttribute("modalTitle", "New");
-		return "room/modals :: modalNewOrEdit";
+		return MODAL_ROOM_NEW_OR_EDIT;
 	}
 
 	/**
 	 * Save a new room by submitting the form.
 	 */
-	@RequestMapping(value = "/room/new", method = RequestMethod.POST)
+	@PostMapping(value = ENDPOINT_ROOMS_BASE_URL)
 	public String addRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
 		return saveOrUpdateRoom(room, result);
 	}
@@ -71,19 +78,20 @@ public class RoomController {
 	/**
 	 * Display form for an already saved room with pre-filled fields.
 	 */
-	@RequestMapping(value = "/room/{id}/edit", method = RequestMethod.GET)
+	@PutMapping(value = ENDPOINT_ROOMS_BASE_URL + "/{id}/form")
 	public String viewRoom(@PathVariable(value = "id") int id, Model model) {
 		Room room = roomService.findById(id);
 		model.addAttribute("room", room);
-		model.addAttribute("actionUrl", "/admin/room/" + id + "/edit");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_ROOMS_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "PUT");
 		model.addAttribute("modalTitle", "Edit");
-		return "room/modals :: modalNewOrEdit";
+		return MODAL_ROOM_NEW_OR_EDIT;
 	}
 	
 	/**
 	 * Update a room by submitting the form.
 	 */
-	@RequestMapping(value = "/room/{id}/edit", method = RequestMethod.POST)
+	@PutMapping(value = ENDPOINT_ROOMS_BASE_URL + "/{id}")
 	public String editRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
 		return saveOrUpdateRoom(room, result);
 	}
@@ -91,18 +99,19 @@ public class RoomController {
 	/**
 	 * Display a confirmation dialog before deleting a room.
 	 */
-	@RequestMapping(value = "/room/{id}/delete", method = RequestMethod.GET)
-	public String confrimDeleteRoom(@PathVariable(value = "id") int id, Model model) {
+	@DeleteMapping(value = ENDPOINT_ROOMS_BASE_URL + "/{id}/confirmation")
+	public String confirmDeleteRoom(@PathVariable(value = "id") int id, Model model) {
 		Room room = roomService.findById(id);
 		model.addAttribute("room", room);
-		model.addAttribute("actionUrl", "/admin/room/" + id + "/delete");
-		return "room/modals :: modalDelete";
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_ROOMS_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "DELETE");
+		return MODAL_ROOM_DELETE;
 	}
 
 	/**
 	 * Delete the room after accepting the deletion confirmation.
 	 */
-	@RequestMapping(value = "/room/{id}/delete", method = RequestMethod.POST)
+	@DeleteMapping(value = ENDPOINT_ROOMS_BASE_URL + "/{id}")
 	public String doDeleteRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
 		try {
 			room = roomService.findById(room.getId());
@@ -113,7 +122,7 @@ public class RoomController {
 			model.addAttribute("additionalMessage", "Please check if there are any assigned devices to this room. Only free rooms can be deleted.");
 			return "/error/422";
 		}
-		return "redirect:/admin/room/list";
+		return REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL;
 	}
 
 	private String saveOrUpdateRoom(Room room, BindingResult result) {
@@ -121,10 +130,10 @@ public class RoomController {
 
 		if (result.hasErrors()) {
 			// reload the same page fragment
-			return "room/modals :: modalNewOrEdit";
+			return MODAL_ROOM_NEW_OR_EDIT;
 		}
 
 		roomService.save(room);
-		return "redirect:/admin/room/list";
+		return REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL;
 	}
 }

@@ -9,13 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import eu.codingschool.homeautomation.model.Device;
 import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.services.DeviceService;
 import eu.codingschool.homeautomation.services.PersonService;
@@ -25,6 +20,16 @@ import eu.codingschool.homeautomation.validators.PersonValidator;
 @Controller
 @RequestMapping("/admin")
 public class PersonController {
+
+	private static final String ENDPOINT_PERSONS_BASE_URL = "/people";
+	private static final String ENDPOINT_ADMIN_PERSONS_BASE_URL = "/admin" + ENDPOINT_PERSONS_BASE_URL;
+	private static final String REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL = "redirect:" + ENDPOINT_ADMIN_PERSONS_BASE_URL;
+
+	private static final String MODAL_PERSON_NEW_OR_EDIT = "person/modals :: modalNewOrEdit";
+	private static final String MODAL_PERSON_DELETE = "person/modals :: modalDelete";
+
+	private static final String VIEW_PERSON_LIST = "person/list";
+	private static final String VIEW_ERROR_404 = "/error/404";
 
 	@Autowired
 	public PersonService personService;
@@ -38,7 +43,7 @@ public class PersonController {
 	@Autowired
 	public PersonValidator personValidator;
 
-	@RequestMapping(value = "/person/list", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_PERSONS_BASE_URL)
 	public String getPeople(Model model) {
 		
 		UserDetails loggedInUser = personService.getLoggedInUser();
@@ -49,26 +54,27 @@ public class PersonController {
 		model.addAttribute("people", personService.findAll());
 		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
-		return "person/list";
+		return VIEW_PERSON_LIST;
 	}
 
 	/**
 	 * Display form for an already saved person with pre-filled fields.
 	 */
-	@RequestMapping(value = "/person/{id}/edit", method = RequestMethod.GET)
+	@PutMapping(value = ENDPOINT_PERSONS_BASE_URL + "/{id}/form")
 	public String viewPerson(@PathVariable("id") int id, Model model) {
 		model.addAttribute("personDevices", deviceService.findByPersonsId(id));
 		model.addAttribute("devices", deviceService.findAll());
-		model.addAttribute("actionUrl", "/admin/person/" + id + "/edit");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_PERSONS_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "PUT");
 		model.addAttribute("modalTitle", "Edit");
 		model.addAttribute("person", personService.findById(id));
-		return "person/modals :: modalNewOrEdit";
+		return MODAL_PERSON_NEW_OR_EDIT;
 	}
 
 	/**
 	 * Update a person by submitting the form.
 	 */
-	@RequestMapping(value = "/person/{id}/edit", method = RequestMethod.POST)
+	@PutMapping(value = ENDPOINT_PERSONS_BASE_URL + "/{id}")
 	public String editPerson(
 			@ModelAttribute("person") Person person,
 			@RequestParam(value = "selectedDeviceIds", required = false) List<String> selectedDeviceIds,
@@ -84,39 +90,40 @@ public class PersonController {
 		if (result.hasErrors()) {
 			// reload the same page fragment
 			model.addAttribute("person", person);
-			return "person/modals :: modalNewOrEdit";
+			return MODAL_PERSON_NEW_OR_EDIT;
 		}		
 		
 		personService.update(person, deviceService.getSelectedDevices(selectedDeviceIds));
 		
 		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
-		return "redirect:/admin/person/list";
+		return REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL;
 	}
 
 	/**
 	 * Display a confirmation dialog before deleting a user.
 	 */
-	@RequestMapping(value = "/person/{id}/delete", method = RequestMethod.GET)
+	@DeleteMapping(value = ENDPOINT_PERSONS_BASE_URL + "/{id}/confirmation")
 	public String confirmDeletePerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
 		model.addAttribute("person", person);
-		model.addAttribute("actionUrl", "/admin/person/" + id + "/delete");
-		return "person/modals :: modalDelete";
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_PERSONS_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "DELETE");
+		return MODAL_PERSON_DELETE;
 	}
 
 	/**
 	 * Delete the person after accepting the deletion confirmation.
 	 */
-	@RequestMapping(value = "/person/{id}/delete", method = RequestMethod.POST)
+	@DeleteMapping(value = ENDPOINT_PERSONS_BASE_URL + "/{id}")
 	public String doDeletePerson(@PathVariable("id") int id, Model model) {
 		Person person = personService.findById(id);
 		if (person == null) {
-			return "redirect:/error/404";
+			return "redirect:" + VIEW_ERROR_404;
 		}
 		person.removeAllDevices();
 		personService.delete(person);
-		return "redirect:/admin/person/list";
+		return REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL;
 	}
 
 }

@@ -7,8 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,7 +53,16 @@ public class RoomControllerTest {
 	@MockBean
 	@Qualifier("roomServiceImpl")
 	private RoomService roomService;
-	
+
+	private static final String ENDPOINT_ADMIN_ROOMS_BASE_URL = "/admin/rooms";
+	private static final String ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL = ENDPOINT_ADMIN_ROOMS_BASE_URL + "/{id}";
+	private static final String REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL = "redirect:" + ENDPOINT_ADMIN_ROOMS_BASE_URL;
+
+	private static final String MODAL_ROOM_NEW_OR_EDIT = "room/modals :: modalNewOrEdit";
+	private static final String MODAL_ROOM_DELETE = "room/modals :: modalDelete";
+
+	private static final String VIEW_ROOM_LIST = "room/list";
+
 	private Person admin;
 	private Set<Room> allRooms;
 	
@@ -82,25 +90,29 @@ public class RoomControllerTest {
 		when(personService.findByEmail(any())).thenReturn(admin);
 		
 		// when - then
-		this.mockMvc.perform(get("/admin/room/list"))
+		this.mockMvc.perform(get(ENDPOINT_ADMIN_ROOMS_BASE_URL))
 					.andExpect(status().isOk()) 
 					.andExpect(model().attribute("loggedInUser", admin))
 					.andExpect(model().attribute("rooms", allRooms))
-					.andExpect(view().name("room/list"));
+					.andExpect(view().name(VIEW_ROOM_LIST));
 	}
 	
 	@Test
 	@WithMockUser
 	public void newRoom_Should_OpenModal_When_Requested() throws Exception {
 		// when - then
-		performHttpGetAction("new", -1, "modalNewOrEdit");
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL + "/form").with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 	}
 	
 	@Test
 	@WithMockUser
 	public void addRoom_Should_SaveRoom_When_Provided() throws Exception {
 		// when - then
-		performHttpPostAction("new", -1, "/admin/room/list");
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_ROOMS_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL));
 		
 		verify(roomService, times(1)).save(any());
 	}
@@ -116,11 +128,9 @@ public class RoomControllerTest {
 		}).when(roomValidator).validate(any(), any());
 		
 		// when - then
-		this.mockMvc.perform(post("/admin/room/new")
-								.with(csrf())
-					)
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL).with(csrf()))
 					.andExpect(status().isOk())
-					.andExpect(view().name("room/modals :: modalNewOrEdit"));
+					.andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 		
 		verifyZeroInteractions(roomService);
 	}
@@ -132,7 +142,9 @@ public class RoomControllerTest {
 		Integer roomId = 2;
 		
 		// when - then
-		performHttpGetAction("edit", roomId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL + "/form", roomId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 		
 		verify(roomService, times(1)).findById(roomId);
 		verify(roomService, times(0)).findById(roomId + 1);
@@ -146,7 +158,9 @@ public class RoomControllerTest {
 		Integer roomId = 2;
 				
 		// when - then
-		performHttpPostAction("edit", roomId, "/admin/room/list");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_ROOMS_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL));
 		
 		verify(roomService, times(1)).save(any());
 	}
@@ -164,19 +178,23 @@ public class RoomControllerTest {
 		}).when(roomValidator).validate(any(), any());
 		
 		// when - then
-		performHttpPostActionWithValidationErrors("edit", roomId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 		
 		verifyZeroInteractions(roomService);
 	}
 	
 	@Test
 	@WithMockUser
-	public void confrimDeleteRoom_Should_OpenModal_When_Requested() throws Exception {
+	public void confirmDeleteRoom_Should_OpenModal_When_Requested() throws Exception {
 		// given
 		Integer roomId = 2;
 		
 		// when - then
-		performHttpGetAction("delete", roomId, "modalDelete");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL + "/confirmation", roomId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_ROOM_DELETE));
 		
 		verify(roomService, times(1)).findById(roomId);
 		verify(roomService, times(0)).findById(roomId + 1);
@@ -190,7 +208,9 @@ public class RoomControllerTest {
 		Integer roomId = 2;
 				
 		// when - then
-		performHttpPostAction("delete", roomId, "/admin/room/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_ROOMS_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL));
 		
 		verify(roomService, times(1)).delete(any());
 	}
@@ -202,33 +222,11 @@ public class RoomControllerTest {
 		Integer roomId = 3; // this room does not exist
 				
 		// when - then
-		performHttpPostAction("delete", roomId, "/admin/room/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_ROOMS_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_ROOMS_BASE_URL));
 		
 		verify(roomService, times(1)).delete(any());
-	}
-	
-	private void performHttpGetAction(String actionType, Integer roomId, String modalName) throws Exception {
-		this.mockMvc.perform(get("/admin/room/" + (roomId != -1 ? roomId : "") + "/" + actionType))
-					.andExpect(status().isOk())
-					.andExpect(view().name("room/modals :: " + modalName));
-	}
-	
-	private void performHttpPostAction(String actionType, Integer roomId, String expectedUrl) throws Exception {
-		this.mockMvc.perform(post("/admin/room/" + (roomId != -1 ? roomId : "") + "/" + actionType)
-								.with(csrf())
-					)
-					.andExpect(redirectedUrl(expectedUrl))
-					.andExpect(view().name("redirect:" + expectedUrl));
-	}
-	
-	private void performHttpPostActionWithValidationErrors(String actionType, Integer roomId, String modalName) 
-			throws Exception {
-		
-		this.mockMvc.perform(post("/admin/room/" + roomId + "/" + actionType)
-							.with(csrf())
-					)
-					.andExpect(status().isOk())
-					.andExpect(view().name("room/modals :: " + modalName));
 	}
 	
 }

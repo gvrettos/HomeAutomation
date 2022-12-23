@@ -7,9 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.services.PersonService;
@@ -28,7 +26,15 @@ public class IndexController {
 	@Autowired
 	private RoomService roomService;
 
-	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
+	private static final String ENDPOINT_ROOT = "/";
+	private static final String VIEW_INDEX = "index";
+	private static final String ENDPOINT_INDEX = ENDPOINT_ROOT + VIEW_INDEX;
+	private static final String VIEW_LOGIN = "login";
+	private static final String ENDPOINT_LOGIN = ENDPOINT_ROOT + VIEW_LOGIN;
+	private static final String VIEW_REGISTRATION = "registration";
+	private static final String ENDPOINT_REGISTRATION = ENDPOINT_ROOT + VIEW_REGISTRATION;
+
+	@GetMapping(value = { ENDPOINT_ROOT, ENDPOINT_INDEX })
 	public String home(ModelMap model) {
 		Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (userDetails instanceof UserDetails) {
@@ -43,13 +49,13 @@ public class IndexController {
 					model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
 				}
 			}
-			return "index";
+			return VIEW_INDEX;
 		}
 		
-		return "login";
+		return VIEW_LOGIN;
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_LOGIN)
 	public String login(Model model, String error, String logout) {
 		if (error != null)
 			model.addAttribute("error", "Your username and password is invalid.");
@@ -58,32 +64,32 @@ public class IndexController {
 			model.addAttribute("message", "You have been logged out successfully.");
 		}
 		
-		return "login";
+		return VIEW_LOGIN;
 	}
 
-	@RequestMapping(value = "/registration", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_REGISTRATION)
 	public String registration(Model model) {
 		model.addAttribute("user", new Person());
-		return "registration";
+		return VIEW_REGISTRATION;
 	}
 
-	@RequestMapping(value = "/registration", method = RequestMethod.POST)
+	@PostMapping(value = ENDPOINT_REGISTRATION)
 	public String registration(@ModelAttribute("user") Person person, BindingResult bindingResult, Model model) {
 		personValidator.validate(person, bindingResult);
 
 		if (bindingResult.hasErrors()) {
-			return "registration";
+			return VIEW_REGISTRATION;
 		}
 		personService.save(person);
-		return "redirect:/index";
+		return "redirect:" + ENDPOINT_INDEX;
 	}
 	
-	@RequestMapping(value = "/error/403", method = RequestMethod.GET)
+	@GetMapping(value = "/error/403")
 	public String error403(Model model) {
 		return "error/403";
 	}
 	
-	@RequestMapping(value = "/error/422", method = RequestMethod.GET)
+	@GetMapping(value = "/error/422")
 	public String error422(Model model) {
 		return "error/422";
 	}

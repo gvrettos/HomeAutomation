@@ -7,8 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,6 +60,16 @@ public class PersonControllerTest {
 	@MockBean
 	@Qualifier("roomServiceImpl")
 	private RoomService roomService;
+
+	private static final String ENDPOINT_ADMIN_PERSONS_BASE_URL = "/admin/people";
+	private static final String ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL = ENDPOINT_ADMIN_PERSONS_BASE_URL + "/{id}";
+	private static final String REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL = "redirect:" + ENDPOINT_ADMIN_PERSONS_BASE_URL;
+
+	private static final String VIEW_PERSON_LIST = "person/list";
+	private static final String VIEW_ERROR_404 = "/error/404";
+
+	private static final String MODAL_PERSON_NEW_OR_EDIT = "person/modals :: modalNewOrEdit";
+	private static final String MODAL_PERSON_DELETE = "person/modals :: modalDelete";
 	
 	private Person admin;
 	private List<Person> allPeople;
@@ -99,18 +108,18 @@ public class PersonControllerTest {
 		when(personService.findByEmail(any())).thenReturn(admin);
 		
 		// when - then
-		this.mockMvc.perform(get("/admin/person/list"))
+		this.mockMvc.perform(get(ENDPOINT_ADMIN_PERSONS_BASE_URL))
 					.andExpect(status().isOk()) 
 					.andExpect(model().attribute("loggedInUser", admin))
 					.andExpect(model().attribute("rooms", allRooms))
-					.andExpect(view().name("person/list"));
+					.andExpect(view().name(VIEW_PERSON_LIST));
 	}
 	
 	@Test
 	@WithMockUser
 	public void getPeople_Should_DenyAccess_When_NotLoggedIn() throws Exception {
 		// when - then
-		this.mockMvc.perform(get("/admin/person/list"))
+		this.mockMvc.perform(get(ENDPOINT_ADMIN_PERSONS_BASE_URL))
 					.andExpect(status().isForbidden());
 	}
 	
@@ -121,7 +130,9 @@ public class PersonControllerTest {
 		Integer personId = 2;
 		
 		// when - then
-		performHttpGetAction("edit", personId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL + "/form", personId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_PERSON_NEW_OR_EDIT));
 		
 		verify(personService, times(1)).findById(personId);
 		verify(personService, times(0)).findById(personId + 1);
@@ -137,7 +148,9 @@ public class PersonControllerTest {
 		when(personService.findByEmail(any())).thenReturn(admin);
 				
 		// when - then
-		performHttpPostAction("edit", personId, "/admin/person/list");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_PERSONS_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL));
 		
 		verify(personService, times(1)).getLoggedInUser();
 		verify(personService, times(1)).update(any(), any());
@@ -158,8 +171,10 @@ public class PersonControllerTest {
 		}).when(personValidator).validate(any(), any());
 		
 		// when - then
-		performHttpPostActionWithValidationErrors("edit", personId, "modalNewOrEdit");
-		
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_PERSON_NEW_OR_EDIT));
+
 		verify(personService, times(1)).getLoggedInUser();
 		verifyNoMoreInteractions(personService);
 	}
@@ -171,7 +186,9 @@ public class PersonControllerTest {
 		Integer personId = 2;
 		
 		// when - then
-		performHttpGetAction("delete", personId, "modalDelete");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL + "/confirmation", personId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_PERSON_DELETE));
 		
 		verify(personService, times(1)).findById(personId);
 		verify(personService, times(0)).findById(personId + 1);
@@ -185,7 +202,9 @@ public class PersonControllerTest {
 		Integer personId = 2;
 				
 		// when - then
-		performHttpPostAction("delete", personId, "/admin/person/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_PERSONS_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL));
 		
 		verify(personService, times(1)).delete(any());
 	}
@@ -194,36 +213,14 @@ public class PersonControllerTest {
 	@WithMockUser
 	public void doDeletePerson_Should_NotCallDelete_When_NotExists() throws Exception {
 		// given
-		Integer personId = 3; // this room does not exist
+		Integer personId = 3; // this person does not exist
 				
 		// when - then
-		performHttpPostAction("delete", personId, "/error/404");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId).with(csrf()))
+					.andExpect(redirectedUrl(VIEW_ERROR_404))
+					.andExpect(view().name("redirect:" + VIEW_ERROR_404));
 		
 		verify(personService, times(0)).delete(any());
-	}
-	
-	private void performHttpGetAction(String actionType, Integer personId, String modalName) throws Exception {
-		this.mockMvc.perform(get("/admin/person/" + (personId != -1 ? personId : "") + "/" + actionType))
-					.andExpect(status().isOk())
-					.andExpect(view().name("person/modals :: " + modalName));
-	}
-	
-	private void performHttpPostAction(String actionType, Integer personId, String expectedUrl) throws Exception {
-		this.mockMvc.perform(post("/admin/person/" + (personId != -1 ? personId : "") + "/" + actionType)
-								.with(csrf())
-					)
-					.andExpect(redirectedUrl(expectedUrl))
-					.andExpect(view().name("redirect:" + expectedUrl));
-	}
-	
-	private void performHttpPostActionWithValidationErrors(String actionType, Integer personId, String modalName) 
-			throws Exception {
-		
-		this.mockMvc.perform(post("/admin/person/" + personId + "/" + actionType)
-							.with(csrf())
-					)
-					.andExpect(status().isOk())
-					.andExpect(view().name("person/modals :: " + modalName));
 	}
 	
 }

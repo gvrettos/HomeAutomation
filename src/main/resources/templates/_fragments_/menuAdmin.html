@@ -6,22 +6,22 @@
 				<span>System Management</span>
 			</li>
 			<li>
-				<a href="#" th:href="@{/admin/person/list}"> 
+				<a href="#" th:href="@{/admin/people}">
 					<i class="fa fa-user"></i> <span>Users</span>
 				</a>
 			</li>
 			<li>
-				<a href="#" th:href="@{/admin/deviceType/list}"> 
+				<a href="#" th:href="@{/admin/deviceTypes}"> 
 					<i class="fa fa-cogs"></i> <span>Device Types</span>
 				</a>
 			</li>
 			<li>
-				<a href="#" th:href="@{/admin/device/list}"> 
+				<a href="#" th:href="@{/admin/devices}">
 					<i class="fa fa-tv"></i> <span>Devices</span>
 				</a>
 			</li>
 			<li>
-				<a href="#" th:href="@{/admin/room/list}"> 
+				<a href="#" th:href="@{/admin/rooms}">
 					<i class="fa fa-bed"></i> <span>Rooms</span>
 				</a>
 			</li>
@@ -30,7 +30,7 @@
 				<span>Devices Management</span>
 			</li>
 			<li>
-				<a href="#" th:href="@{/admin/device/user/all}"> 
+				<a href="#" th:href="@{/admin/devices/user/all}">
 					<i class="fa fa-cogs"></i> <span>All rooms</span>
 				</a>
 			</li>
@@ -42,7 +42,7 @@
 					<ul>
 						<li th:each="room : ${rooms}">
 							<a href="#" 
-							   th:href="@{/admin/device/user/all/room/{roomId}(roomId=${room.getId()})}" 
+							   th:href="@{/admin/devices/user/all/room/{roomId}(roomId=${room.getId()})}"
 							   th:text="${room.getName()}"> 
 							   Room 
 							</a>

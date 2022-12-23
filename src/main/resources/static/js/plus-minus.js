@@ -50,7 +50,7 @@ $(document).ready(function() {
 
     function updateDatabase(href, value) {
         $.ajax({
-            type: "POST",
+            type: "PATCH",
             url: href.replace("{value}", value),
             success: function(result) {
                 // TODO this is bad practice since AJAX is used!
@@ -58,6 +58,7 @@ $(document).ready(function() {
             },
 			error: function(err) {
 				console.log("could not update device information value: " + JSON.stringify(err.responseJSON));
+				alert("Something went wrong!\nCheck logs for more information.");
             }
 		});
     }

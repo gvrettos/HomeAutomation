@@ -41,11 +41,11 @@
 					</td>
 					<td class="text-center">
 						<a class="btn btn-info btn-xs btnEdit" href="#"
-						   th:href="@{/admin/person/{id}/edit(id=${person.getId()})}">  
+						   th:href="@{/admin/people/{id}/form(id=${person.getId()})}">
 						   <span class="fa fa-edit"></span> Edit
 						</a> 
 						<a class="btn btn-danger btn-xs btnDelete" href="#"
-						   th:href="@{/admin/person/{id}/delete(id=${person.getId()})}"> 
+						   th:href="@{/admin/people/{id}/confirmation(id=${person.getId()})}">
 						   <span class="fas fa-times"></span> Delete
 						</a>
 					</td>

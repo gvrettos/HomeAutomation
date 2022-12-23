@@ -7,8 +7,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,6 +55,15 @@ public class DeviceTypeControllerTest {
 	@MockBean
 	@Qualifier("deviceTypeServiceImpl")
 	private DeviceTypeService deviceTypeService;
+
+	private static final String ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL = "/admin/deviceTypes";
+	private static final String ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL = ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL + "/{id}";
+	private static final String REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL = "redirect:" + ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL;
+
+	private static final String MODAL_DEVICE_TYPE_NEW_OR_EDIT = "deviceType/modals :: modalNewOrEdit";
+	private static final String MODAL_DEVICE_TYPE_DELETE = "deviceType/modals :: modalDelete";
+
+	private static final String VIEW_DEVICE_TYPE_LIST = "deviceType/list";
 	
 	private Person admin;
 	private List<DeviceType> allDeviceTypes;
@@ -81,25 +92,29 @@ public class DeviceTypeControllerTest {
 		when(personService.findByEmail(any())).thenReturn(admin);
 		
 		// when - then
-		this.mockMvc.perform(get("/admin/deviceType/list"))
+		this.mockMvc.perform(get(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL))
 					.andExpect(status().isOk()) 
 					.andExpect(model().attribute("loggedInUser", admin))
 					.andExpect(model().attribute("deviceTypes", allDeviceTypes))
-					.andExpect(view().name("deviceType/list"));
+					.andExpect(view().name(VIEW_DEVICE_TYPE_LIST));
 	}
 	
 	@Test
 	@WithMockUser
 	public void newDeviceType_Should_OpenModal_When_Requested() throws Exception {
 		// when - then
-		performHttpGetAction("new", -1, "modalNewOrEdit");
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL + "/form").with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_TYPE_NEW_OR_EDIT));
 	}
 	
 	@Test
 	@WithMockUser
 	public void addDeviceType_Should_SaveDeviceType_When_Provided() throws Exception {
 		// when - then
-		performHttpPostAction("new", -1, "/admin/deviceType/list");
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL));
 		
 		verify(deviceTypeService, times(1)).save(any());
 	}
@@ -115,11 +130,9 @@ public class DeviceTypeControllerTest {
 		}).when(deviceTypeValidator).validate(any(), any());
 		
 		// when - then
-		this.mockMvc.perform(post("/admin/deviceType/new")
-								.with(csrf())
-					)
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL).with(csrf()))
 					.andExpect(status().isOk())
-					.andExpect(view().name("deviceType/modals :: modalNewOrEdit"));
+					.andExpect(view().name(MODAL_DEVICE_TYPE_NEW_OR_EDIT));
 		
 		verifyZeroInteractions(deviceTypeService);
 	}
@@ -131,7 +144,9 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 2;
 		
 		// when - then
-		performHttpGetAction("edit", deviceTypeId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL + "/form", deviceTypeId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_TYPE_NEW_OR_EDIT));
 		
 		verify(deviceTypeService, times(1)).findById(deviceTypeId);
 		verify(deviceTypeService, times(0)).findById(deviceTypeId + 1);
@@ -145,7 +160,9 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 2;
 				
 		// when - then
-		performHttpPostAction("edit", deviceTypeId, "/admin/deviceType/list");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL, deviceTypeId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL));
 		
 		verify(deviceTypeService, times(1)).save(any());
 	}
@@ -163,19 +180,23 @@ public class DeviceTypeControllerTest {
 		}).when(deviceTypeValidator).validate(any(), any());
 		
 		// when - then
-		performHttpPostActionWithValidationErrors("edit", deviceTypeId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL, deviceTypeId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_TYPE_NEW_OR_EDIT));
 		
 		verifyZeroInteractions(deviceTypeService);
 	}
 	
 	@Test
 	@WithMockUser
-	public void confrimDeleteDeviceType_Should_OpenModal_When_Requested() throws Exception {
+	public void confirmDeleteDeviceType_Should_OpenModal_When_Requested() throws Exception {
 		// given
 		Integer deviceTypeId = 2;
 		
 		// when - then
-		performHttpGetAction("delete", deviceTypeId, "modalDelete");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL + "/confirmation", deviceTypeId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_TYPE_DELETE));
 		
 		verify(deviceTypeService, times(1)).findById(deviceTypeId);
 		verify(deviceTypeService, times(0)).findById(deviceTypeId + 1);
@@ -189,7 +210,9 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 2;
 				
 		// when - then
-		performHttpPostAction("delete", deviceTypeId, "/admin/deviceType/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL, deviceTypeId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL));
 		
 		verify(deviceTypeService, times(1)).delete(any());
 	}
@@ -201,33 +224,11 @@ public class DeviceTypeControllerTest {
 		Integer deviceTypeId = 3; // this room does not exist
 				
 		// when - then
-		performHttpPostAction("delete", deviceTypeId, "/admin/deviceType/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICE_TYPES_EDIT_OR_DELETE_BASE_URL, deviceTypeId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL));
 		
 		verify(deviceTypeService, times(1)).delete(any());
-	}
-	
-	private void performHttpGetAction(String actionType, Integer deviceTypeId, String modalName) throws Exception {
-		this.mockMvc.perform(get("/admin/deviceType/" + (deviceTypeId != -1 ? deviceTypeId : "") + "/" + actionType))
-					.andExpect(status().isOk())
-					.andExpect(view().name("deviceType/modals :: " + modalName));
-	}
-	
-	private void performHttpPostAction(String actionType, Integer deviceTypeId, String expectedUrl) throws Exception {
-		this.mockMvc.perform(post("/admin/deviceType/" + (deviceTypeId != -1 ? deviceTypeId : "") + "/" + actionType)
-								.with(csrf())
-					)
-					.andExpect(redirectedUrl(expectedUrl))
-					.andExpect(view().name("redirect:" + expectedUrl));
-	}
-	
-	private void performHttpPostActionWithValidationErrors(String actionType, Integer deviceTypeId, String modalName) 
-			throws Exception {
-		
-		this.mockMvc.perform(post("/admin/deviceType/" + deviceTypeId + "/" + actionType)
-							.with(csrf())
-					)
-					.andExpect(status().isOk())
-					.andExpect(view().name("deviceType/modals :: " + modalName));
 	}
 	
 }

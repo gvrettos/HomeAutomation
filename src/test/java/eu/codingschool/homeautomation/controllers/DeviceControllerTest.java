@@ -8,7 +8,10 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -69,6 +72,17 @@ public class DeviceControllerTest {
 	@MockBean
 	@Qualifier("roomServiceImpl")
 	private RoomService roomService;
+
+	private static final String ENDPOINT_DEVICES_BASE_URL = "/devices";
+	private static final String ENDPOINT_ADMIN_DEVICES_BASE_URL = "/admin/devices";
+	private static final String ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}";
+	private static final String REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL = "redirect:" + ENDPOINT_ADMIN_DEVICES_BASE_URL;
+
+	private static final String MODAL_DEVICE_NEW_OR_EDIT = "device/modals :: modalNewOrEdit";
+	private static final String MODAL_DEVICE_DELETE = "device/modals :: modalDelete";
+
+	private static final String VIEW_DEVICE_LIST = "device/list";
+	private static final String VIEW_DEVICE_GRID = "device/grid";
 	
 	private Room livingRoom;
 	private Room kitchen;
@@ -142,21 +156,25 @@ public class DeviceControllerTest {
 	@Test
 	@WithMockUser
 	public void getAdminDevicesList_Should_LoadAllDevices_When_AdminLoggedInAndRequestingDevices() throws Exception {
-		getAllDevices("/admin/device/list", "device/list");
+		getAllDevices(ENDPOINT_ADMIN_DEVICES_BASE_URL, VIEW_DEVICE_LIST);
 	}
 	
 	@Test
 	@WithMockUser
 	public void newDevice_Should_OpenModal_When_Requested() throws Exception {
 		// when - then
-		performHttpGetAction("new", -1, "modalNewOrEdit");
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/form").with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT));
 	}
 	
 	@Test
 	@WithMockUser
 	public void addDevice_Should_SaveDevice_When_Provided() throws Exception {
 		// when - then
-		performHttpPostAction("new", -1, "/admin/device/list");
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		verify(deviceService, times(1)).save(any());
 	}
@@ -172,11 +190,9 @@ public class DeviceControllerTest {
 		}).when(deviceValidator).validate(any(), any());
 		
 		// when - then
-		this.mockMvc.perform(post("/admin/device/new")
-								.with(csrf())
-					)
+		this.mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL).with(csrf()))
 					.andExpect(status().isOk())
-					.andExpect(view().name("device/modals :: modalNewOrEdit"));
+					.andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT));
 		
 		verifyZeroInteractions(deviceService);
 	}
@@ -188,7 +204,9 @@ public class DeviceControllerTest {
 		Integer deviceId = 2;
 		
 		// when - then
-		performHttpGetAction("edit", deviceId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL + "/form", deviceId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT));
 		
 		verify(deviceService, times(1)).findById(deviceId);
 		verify(deviceService, times(0)).findById(deviceId + 1);
@@ -202,7 +220,9 @@ public class DeviceControllerTest {
 		Integer deviceId = 2;
 				
 		// when - then
-		performHttpPostAction("edit", deviceId, "/admin/device/list");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		verify(deviceService, times(1)).save(any());
 	}
@@ -220,19 +240,23 @@ public class DeviceControllerTest {
 		}).when(deviceValidator).validate(any(), any());
 		
 		// when - then
-		performHttpPostActionWithValidationErrors("edit", deviceId, "modalNewOrEdit");
+		this.mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT));
 		
 		verifyZeroInteractions(deviceService);
 	}
 	
 	@Test
 	@WithMockUser
-	public void confrimDeleteDevice_Should_OpenModal_When_Requested() throws Exception {
+	public void confirmDeleteDevice_Should_OpenModal_When_Requested() throws Exception {
 		// given
 		Integer deviceId = 2;
 		
 		// when - then
-		performHttpGetAction("delete", deviceId, "modalDelete");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL + "/confirmation", deviceId).with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(view().name(MODAL_DEVICE_DELETE));
 		
 		verify(deviceService, times(1)).findById(deviceId);
 		verify(deviceService, times(0)).findById(deviceId + 1);
@@ -246,7 +270,9 @@ public class DeviceControllerTest {
 		Integer deviceId = 2;
 				
 		// when - then
-		performHttpPostAction("delete", deviceId, "/admin/device/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		verify(deviceService, times(1)).delete(any());
 	}
@@ -255,10 +281,12 @@ public class DeviceControllerTest {
 	@WithMockUser
 	public void doDeleteDevice_Should_CallDelete_When_NotExists() throws Exception {
 		// given
-		Integer deviceId = 3; // this room does not exist
+		Integer deviceId = 4; // this device does not exist
 				
 		// when - then
-		performHttpPostAction("delete", deviceId, "/admin/device/list");
+		this.mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId).with(csrf()))
+					.andExpect(redirectedUrl(ENDPOINT_ADMIN_DEVICES_BASE_URL))
+					.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		verify(deviceService, times(1)).delete(any());
 	}
@@ -266,7 +294,7 @@ public class DeviceControllerTest {
 	@Test
 	@WithMockUser
 	public void showAdminDevices_Should_LoadAllDevices_When_AdminLoggedInAndRequestingDevices() throws Exception {
-		getAllDevices("/admin/device/user/all", "userDevices/grid");
+		getAllDevices(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all", VIEW_DEVICE_GRID);
 	}
 	
 	@Test
@@ -278,12 +306,12 @@ public class DeviceControllerTest {
 		when(personService.findByEmail(personService.getLoggedInUser().getUsername())).thenReturn(simpleUser);
 		
 		// when - then
-		this.mockMvc.perform(get("/device/user/" + userId))
+		this.mockMvc.perform(get(ENDPOINT_DEVICES_BASE_URL + "/user/" + userId))
 			.andExpect(status().isOk()) 
 			.andExpect(model().attribute("loggedInUser", simpleUser))
 			.andExpect(model().attribute("devices", simpleUserAllDevices))
 			.andExpect(model().attribute("rooms", simpleUserRooms))
-			.andExpect(view().name("userDevices/grid"));
+			.andExpect(view().name(VIEW_DEVICE_GRID));
 	}
 	
 	@Test
@@ -297,13 +325,13 @@ public class DeviceControllerTest {
 		when(personService.findByEmail(any())).thenReturn(admin);
 		
 		// when - then
-		this.mockMvc.perform(get("/admin/device/user/all/room/" + roomId))
+		this.mockMvc.perform(get(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all/room/" + roomId))
 			.andExpect(status().isOk()) 
 			.andExpect(model().attribute("loggedInUser", admin))
 			.andExpect(model().attribute("devices", new ArrayList<>(livingRoom.getDevices())))
 			.andExpect(model().attribute("rooms", allRooms))
 			.andExpect(model().attribute("selectedRoom", livingRoom.getName()))
-			.andExpect(view().name("userDevices/grid"));
+			.andExpect(view().name(VIEW_DEVICE_GRID));
 	}
 	
 	@Test
@@ -319,13 +347,13 @@ public class DeviceControllerTest {
 		when(deviceService.findByPersonsIdAndRoomId(userId, roomId)).thenReturn(simpleUserLivingRoomDevices);
 		
 		// when - then
-		this.mockMvc.perform(get("/device/user/" + userId + "/room/" + roomId))
+		this.mockMvc.perform(get(ENDPOINT_DEVICES_BASE_URL + "/user/" + userId + "/room/" + roomId))
 			.andExpect(status().isOk()) 
 			.andExpect(model().attribute("loggedInUser", simpleUser))
 			.andExpect(model().attribute("devices", simpleUserLivingRoomDevices))
 			.andExpect(model().attribute("rooms", simpleUserRooms))
 			.andExpect(model().attribute("selectedRoom", livingRoom.getName()))
-			.andExpect(view().name("userDevices/grid"));
+			.andExpect(view().name(VIEW_DEVICE_GRID));
 	}
 	
 	@Test
@@ -334,7 +362,7 @@ public class DeviceControllerTest {
 			throws Exception {
 		
 		updateDeviceStatus_Should_RedirectToDevices_When_AnyUserLoggedInAndSettingStatusToAnything(
-				new User("user-foo", "pass-foo", Arrays.asList()), admin, true, "/admin/device/user/all");
+				new User("user-foo", "pass-foo", Arrays.asList()), admin, true, ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all");
 	}
 	
 	@Test
@@ -343,7 +371,7 @@ public class DeviceControllerTest {
 			throws Exception {
 		
 		updateDeviceStatus_Should_RedirectToDevices_When_AnyUserLoggedInAndSettingStatusToAnything(
-				new User("user-foo", "pass-foo", Arrays.asList()), admin, false, "/admin/device/user/all");
+				new User("user-foo", "pass-foo", Arrays.asList()), admin, false, ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all");
 	}
 	
 	@Test
@@ -353,9 +381,9 @@ public class DeviceControllerTest {
 		
 		updateDeviceStatus_Should_RedirectToDevices_When_AnyUserLoggedInAndSettingStatusToAnything(
 				new User(SIMPLE_USER_EMAIL, "pass-foo", Arrays.asList()), 
-				simpleUser, 
-				true, 
-				"/device/user/" + simpleUser.getId());
+				simpleUser,
+				true,
+				ENDPOINT_DEVICES_BASE_URL + "/user/" + simpleUser.getId());
 	}
 	
 	@Test
@@ -366,8 +394,8 @@ public class DeviceControllerTest {
 		updateDeviceStatus_Should_RedirectToDevices_When_AnyUserLoggedInAndSettingStatusToAnything(
 				new User(SIMPLE_USER_EMAIL, "pass-foo", Arrays.asList()), 
 				simpleUser, 
-				false, 
-				"/device/user/" + simpleUser.getId());
+				false,
+				ENDPOINT_DEVICES_BASE_URL + "/user/" + simpleUser.getId());
 	}
 	
 	@Test
@@ -376,7 +404,7 @@ public class DeviceControllerTest {
 			throws Exception {
 		
 		updateDeviceInformationValue_Should_RedirectToDevices_When_AnyUserLoggedInAndChangingInformationValue(
-				new User("user-foo", "pass-foo", Arrays.asList()), admin, "20", "/admin/device/user/all");
+				new User("user-foo", "pass-foo", Arrays.asList()), admin, "20", ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all");
 	}
 	
 	@Test
@@ -387,46 +415,22 @@ public class DeviceControllerTest {
 		updateDeviceInformationValue_Should_RedirectToDevices_When_AnyUserLoggedInAndChangingInformationValue(
 				new User(SIMPLE_USER_EMAIL, "pass-foo", Arrays.asList()), 
 				simpleUser, 
-				"20", 
-				"/device/user/" + simpleUser.getId());
+				"20",
+				ENDPOINT_DEVICES_BASE_URL + "/user/" + simpleUser.getId());
 	}
 	
-	private void getAllDevices(String endpoint, String expectedUrl) throws Exception {
+	private void getAllDevices(String endpointUrl, String expectedView) throws Exception {
 		// given
 		when(personService.getLoggedInUser()).thenReturn(new User("user-foo", "pass-foo", Arrays.asList()));
 		when(personService.findByEmail(any())).thenReturn(admin);
 		
 		// when - then
-		this.mockMvc.perform(get(endpoint))
+		this.mockMvc.perform(get(endpointUrl))
 					.andExpect(status().isOk()) 
 					.andExpect(model().attribute("loggedInUser", admin))
 					.andExpect(model().attribute("devices", allDevices))
 					.andExpect(model().attribute("rooms", allRooms))
-					.andExpect(view().name(expectedUrl));
-	}
-	
-	private void performHttpGetAction(String actionType, Integer deviceId, String modalName) throws Exception {
-		this.mockMvc.perform(get("/admin/device/" + (deviceId != -1 ? deviceId : "") + "/" + actionType))
-					.andExpect(status().isOk())
-					.andExpect(view().name("device/modals :: " + modalName));
-	}
-	
-	private void performHttpPostAction(String actionType, Integer deviceId, String expectedUrl) throws Exception {
-		this.mockMvc.perform(post("/admin/device/" + (deviceId != -1 ? deviceId : "") + "/" + actionType)
-								.with(csrf())
-					)
-					.andExpect(redirectedUrl(expectedUrl))
-					.andExpect(view().name("redirect:" + expectedUrl));
-	}
-	
-	private void performHttpPostActionWithValidationErrors(String actionType, Integer deviceId, String modalName) 
-			throws Exception {
-		
-		this.mockMvc.perform(post("/admin/device/" + deviceId + "/" + actionType)
-							.with(csrf())
-					)
-					.andExpect(status().isOk())
-					.andExpect(view().name("device/modals :: " + modalName));
+					.andExpect(view().name(expectedView));
 	}
 	
 	private void updateDeviceStatus_Should_RedirectToDevices_When_AnyUserLoggedInAndSettingStatusToAnything(
@@ -438,7 +442,7 @@ public class DeviceControllerTest {
 		when(personService.findByEmail(any())).thenReturn(user);
 		
 		// when - then
-		this.mockMvc.perform(post("/device/" + deviceId +  "/updateStatus/" + status)
+		this.mockMvc.perform(patch(ENDPOINT_DEVICES_BASE_URL + "/" + deviceId +  "/updateStatus/" + status)
 								.with(csrf())
 					)
 					.andExpect(redirectedUrl(expectedUrl))
@@ -454,7 +458,7 @@ public class DeviceControllerTest {
 		when(personService.findByEmail(any())).thenReturn(user);
 		
 		// when - then
-		this.mockMvc.perform(post("/device/" + deviceId +  "/updateValue/" + value)
+		this.mockMvc.perform(patch(ENDPOINT_DEVICES_BASE_URL + "/" + deviceId +  "/updateValue/" + value)
 								.with(csrf())
 					)
 					.andExpect(redirectedUrl(expectedUrl))

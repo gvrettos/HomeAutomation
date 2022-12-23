@@ -11,7 +11,7 @@
 		<div class="modal-dialog row" role="document">
 			<div class="modal-content">
 
-				<form th:action="@{${actionUrl}}" th:method="post" th:object="${deviceType}" id="formNewOrEdit"
+				<form th:action="@{${actionUrl}}" th:method="${actionType}" th:object="${deviceType}" id="formNewOrEdit"
 					  class="form-horizontal" role="form">
 					<fieldset>
 					<div class="modal-header">
@@ -49,7 +49,7 @@
 	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" th:fragment="modalDelete">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
-				<form th:action="@{${actionUrl}}" th:method="post" th:object="${deviceType}">
+				<form th:action="@{${actionUrl}}" th:method="${actionType}" th:object="${deviceType}">
 					<div class="modal-header">
 						<h5 class="modal-title">Delete Device Type</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
