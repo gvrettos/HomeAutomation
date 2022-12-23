@@ -8,10 +8,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.codingschool.homeautomation.model.DeviceType;
 import eu.codingschool.homeautomation.services.DeviceTypeService;
@@ -21,7 +24,16 @@ import eu.codingschool.homeautomation.validators.DeviceTypeValidator;
 @Controller
 @RequestMapping("/admin")
 public class DeviceTypeController {
-	
+
+	private static final String ENDPOINT_DEVICE_TYPES_BASE_URL = "/deviceTypes";
+	private static final String ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL = "/admin" + ENDPOINT_DEVICE_TYPES_BASE_URL;
+	private static final String REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL = "redirect:" + ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL;
+
+	private static final String MODAL_DEVICE_TYPE_NEW_OR_EDIT = "deviceType/modals :: modalNewOrEdit";
+	private static final String MODAL_DEVICE_TYPE_DELETE = "deviceType/modals :: modalDelete";
+
+	private static final String VIEW_DEVICE_TYPE_LIST = "deviceType/list";
+
 	@Autowired
 	private DeviceTypeService deviceTypeService;
 	
@@ -30,9 +42,9 @@ public class DeviceTypeController {
 	
 	@Autowired
 	private DeviceTypeValidator deviceTypeValidator;
-	
-	
-	@RequestMapping(value = "/deviceType/list", method = RequestMethod.GET)
+
+
+	@GetMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL)
 	public String getDeviceTypes(Model model) {
 		String email = "";
         Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -42,25 +54,26 @@ public class DeviceTypeController {
         
 		model.addAttribute("deviceTypes", deviceTypeService.findAll());
 		model.addAttribute("loggedInUser", personService.findByEmail(email));
-		return "deviceType/list";
+		return VIEW_DEVICE_TYPE_LIST;
 	}
 	
 	/**
 	 * Display form for new device type with empty fields.
 	 */
-	@RequestMapping(value = "/deviceType/new", method = RequestMethod.GET)
+	@PostMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/form")
 	public String newDeviceType(Model model) {
 		model.addAttribute("deviceType", new DeviceType());
-		model.addAttribute("actionUrl", "/admin/deviceType/new");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL);
+		model.addAttribute("actionType", "POST");
 		model.addAttribute("modalTitle", "New");
-		return "deviceType/modals :: modalNewOrEdit";
+		return MODAL_DEVICE_TYPE_NEW_OR_EDIT;
 	}
 	
 	/**
 	 * Save a new device type by submitting the form.
 	 */
-	@RequestMapping(value = "/deviceType/new", method = RequestMethod.POST)
-	public String addDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, 
+	@PostMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL)
+	public String addDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result,
 			ModelMap model) {
 		return saveOrUpdateDeviceType(deviceType, result);
 	}
@@ -68,19 +81,20 @@ public class DeviceTypeController {
 	/**
 	 * Display form for an already saved device type with pre-filled fields.
 	 */
-	@RequestMapping(value = "/deviceType/{id}/edit", method = RequestMethod.GET)
+	@PutMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/{id}/form")
 	public String viewDeviceType(@PathVariable(value="id") int id, Model model) {
 		DeviceType deviceType = deviceTypeService.findById(id);
 		model.addAttribute("deviceType", deviceType);
-		model.addAttribute("actionUrl", "/admin/deviceType/" + id + "/edit");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "PUT");
 		model.addAttribute("modalTitle", "Edit");
-		return "deviceType/modals :: modalNewOrEdit";
+		return MODAL_DEVICE_TYPE_NEW_OR_EDIT;
 	}
 	
 	/**
 	 * Update a device type by submitting the form.
 	 */
-	@RequestMapping(value = "/deviceType/{id}/edit", method = RequestMethod.POST)
+	@PutMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/{id}")
 	public String editDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, 
 			ModelMap model) {
 		return saveOrUpdateDeviceType(deviceType, result);
@@ -89,18 +103,19 @@ public class DeviceTypeController {
 	/**
 	 * Display a confirmation dialog before deleting a device type.
 	 */
-	@RequestMapping(value = "/deviceType/{id}/delete", method = RequestMethod.GET)
-	public String confrimDeleteDeviceType(@PathVariable(value="id") int id, Model model) {
+	@DeleteMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/{id}/confirmation")
+	public String confirmDeleteDeviceType(@PathVariable(value="id") int id, Model model) {
 		DeviceType deviceType = deviceTypeService.findById(id);
 		model.addAttribute("deviceType", deviceType);
-		model.addAttribute("actionUrl", "/admin/deviceType/" + id + "/delete");
-		return "deviceType/modals :: modalDelete";
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "DELETE");
+		return MODAL_DEVICE_TYPE_DELETE;
 	}
 	
 	/**
 	 * Delete the device type after accepting the deletion confirmation.
 	 */
-	@RequestMapping(value = "/deviceType/{id}/delete", method = RequestMethod.POST)
+	@DeleteMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/{id}")
 	public String doDeleteDeviceType(
 			@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, ModelMap model) {
 		
@@ -113,7 +128,7 @@ public class DeviceTypeController {
 			model.addAttribute("additionalMessage", "Please check if the device type is used by any device. Only unused device types can be deleted.");
 			return "/error/422";
 		}
-		return "redirect:/admin/deviceType/list";
+		return REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL;
 	}
 	
 	private String saveOrUpdateDeviceType(DeviceType deviceType, BindingResult result) {
@@ -121,10 +136,10 @@ public class DeviceTypeController {
 		
 		if (result.hasErrors()) {
 			// reload the same page fragment
-			return "deviceType/modals :: modalNewOrEdit";
+			return MODAL_DEVICE_TYPE_NEW_OR_EDIT;
 		}
 		
 		deviceTypeService.save(deviceType);
-		return "redirect:/admin/deviceType/list";
+		return REDIRECT_ENDPOINT_ADMIN_DEVICE_TYPES_BASE_URL;
 	}
 }

@@ -12,12 +12,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,25 +55,26 @@ public class DeviceControllerIntegrationTest {
 	private DeviceRepository deviceRepository;
 
     private MockMvc mockMvc;
+
+	private static final String ENDPOINT_DEVICES_BASE_URL = "/devices";
+    private static final String ENDPOINT_ADMIN_DEVICES_BASE_URL = "/admin" + ENDPOINT_DEVICES_BASE_URL;
+	private static final String ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}";
+    private static final String ENDPOINT_DEVICE_LIST_ALL_ALTERNATIVE = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all";
+    private static final String ENDPOINT_DEVICE_PER_USER = ENDPOINT_DEVICES_BASE_URL + "/user/{id}";
+    private static final String ENDPOINT_DEVICE_PER_ROOM_ALL = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all/room/{roomId}";
+    private static final String ENDPOINT_DEVICE_PER_ROOM_PER_USER = ENDPOINT_DEVICES_BASE_URL + "/user/{userId}/room/{roomId}";
+    private static final String ENDPOINT_DEVICE_STATUS_EDIT = ENDPOINT_DEVICES_BASE_URL + "/{id}/updateStatus/{status}";
+    private static final String ENDPOINT_DEVICE_VALUE_EDIT = ENDPOINT_DEVICES_BASE_URL + "/{id}/updateValue/{value}";
     
-    private static final String ENDPOINT_DEVICE_LIST = "/admin/device/list";
-    private static final String ENDPOINT_DEVICE_NEW = "/admin/device/new";
-    private static final String ENDPOINT_DEVICE_EDIT = "/admin/device/{id}/edit";
-    private static final String ENDPOINT_DEVICE_DELETE = "/admin/device/{id}/delete";
-    private static final String ENDPOINT_DEVICE_LIST_ALL_ALTERNATIVE = "/admin/device/user/all";
-    private static final String ENDPOINT_DEVICE_PER_USER = "/device/user/{id}";
-    private static final String ENDPOINT_DEVICE_PER_ROOM_ALL = "/admin/device/user/all/room/{roomId}";
-    private static final String ENDPOINT_DEVICE_PER_ROOM_PER_USER = "/device/user/{userId}/room/{roomId}";
-    private static final String ENDPOINT_DEVICE_STATUS_EDIT = "/device/{id}/updateStatus/{status}";
-    private static final String ENDPOINT_DEVICE_VALUE_EDIT = "/device/{id}/updateValue/{value}";
-    
-    private static final String LAYOUT_DEVICE_LIST = "device/list";
-    private static final String LAYOUT_DEVICE_LIST_ALTERNATIVE = "userDevices/grid";
-    private static final String LAYOUT_ERROR_403 = "/error/403";
-    private static final String LAYOUT_ERROR_422 = "/error/422";
+    private static final String VIEW_DEVICE_LIST = "device/list";
+    private static final String VIEW_DEVICE_GRID = "device/grid";
+    private static final String VIEW_ERROR_403 = "/error/403";
+    private static final String VIEW_ERROR_422 = "/error/422";
     
     private static final String MODAL_DEVICE_NEW_OR_EDIT = "device/modals :: modalNewOrEdit";
+	private static final String MODAL_DEVICE_DELETE = "device/modals :: modalDelete";
     private static final String REDIRECT = "redirect:";
+	private static final String REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL = REDIRECT + ENDPOINT_ADMIN_DEVICES_BASE_URL;
     
     private static final String USER_DETAILS_SERVICE = "userDetailsService";
     
@@ -96,23 +94,23 @@ public class DeviceControllerIntegrationTest {
 	@Test
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void getAllDevices_shouldReturnAllAvailableDevices_whenAdminUser() throws Exception {
-		mockMvc.perform(get(ENDPOINT_DEVICE_LIST))
+		mockMvc.perform(get(ENDPOINT_ADMIN_DEVICES_BASE_URL))
 			   .andDo(print())
-			   .andExpect(view().name(LAYOUT_DEVICE_LIST));
+			   .andExpect(view().name(VIEW_DEVICE_LIST));
 	}
 	
 	@Test
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void getAllDevices_shouldBeForbidden_whenSimpleUser() throws Exception {
-		mockMvc.perform(get(ENDPOINT_DEVICE_LIST))
+		mockMvc.perform(get(ENDPOINT_ADMIN_DEVICES_BASE_URL))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void viewNewDeviceForm_shouldDisplayForm_whenAdminUser() throws Exception {
-		mockMvc.perform(get(ENDPOINT_DEVICE_NEW))
+		mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/form"))
 			   .andDo(print())
 			   .andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT));
 	}
@@ -120,9 +118,9 @@ public class DeviceControllerIntegrationTest {
 	@Test
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void viewNewDeviceForm_shouldBeForbidden_whenSimpleUser() throws Exception {
-		mockMvc.perform(get(ENDPOINT_DEVICE_NEW))
+		mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/form"))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -130,13 +128,13 @@ public class DeviceControllerIntegrationTest {
 	public void createNewDevice_shouldDisplayDevicesList_whenSubmittingFormSucceeds() throws Exception {
 		long devicesCountBefore = deviceRepository.count();
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_NEW)
+		mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL)
 							.param("name", "Test lighting")
 							.param("deviceType", "2") // Lights
 							.param("room", "2") // Kitchen
 			   )
 			   .andDo(print())
-			   .andExpect(view().name(REDIRECT + ENDPOINT_DEVICE_LIST));
+			   .andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		long devicesCountAfter = deviceRepository.count();
 		assertEquals(devicesCountBefore + 1, devicesCountAfter);
@@ -145,7 +143,7 @@ public class DeviceControllerIntegrationTest {
 	@Test
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void createNewDevice_shouldDisplayForm_whenSubmittingFormFails() throws Exception {
-		mockMvc.perform(post(ENDPOINT_DEVICE_NEW)
+		mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL)
 							.param("deviceType", "2") // Lights
 							.param("room", "2") // Kitchen
 			   )
@@ -156,24 +154,26 @@ public class DeviceControllerIntegrationTest {
 	@Test
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void createNewDevice_shouldBeForbidden_whenSimpleUser() throws Exception {
-		mockMvc.perform(post(ENDPOINT_DEVICE_NEW))
+		mockMvc.perform(post(ENDPOINT_ADMIN_DEVICES_BASE_URL))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void viewEditDeviceForm_shouldDisplayForm_whenAdminUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(get(ENDPOINT_DEVICE_EDIT, deviceId))
+		mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL + "/form", deviceId))
 			   .andDo(print())
-			   .andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT)).andExpect(model().size(5))
+			   .andExpect(view().name(MODAL_DEVICE_NEW_OR_EDIT))
+			   .andExpect(model().size(6))
 			   .andExpect(model().attribute("allDeviceTypes", hasSize(3)))
 			   .andExpect(model().attribute("allRooms", hasSize(3)))
 			   .andExpect(model().attribute("device", isA(Device.class)))
 			   .andExpect(model().attribute("device", hasProperty("id", equalTo(deviceId))))
 			   .andExpect(model().attribute("device", hasProperty("name", equalTo("Lighting #3"))))
-			   .andExpect(model().attribute("actionUrl", String.format("/admin/device/%s/edit", deviceId)))
+			   .andExpect(model().attribute("actionUrl", String.format(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/%s", deviceId)))
+			   .andExpect(model().attribute("actionType", "PUT"))
 			   .andExpect(model().attribute("modalTitle", "Edit"));
 	}
 	
@@ -181,9 +181,9 @@ public class DeviceControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void viewEditDeviceForm_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(get(ENDPOINT_DEVICE_EDIT, deviceId))
+		mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL + "/form", deviceId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -195,13 +195,13 @@ public class DeviceControllerIntegrationTest {
 		Integer deviceTypeBeforeEdit = deviceBeforeEdit.getDeviceType().getId();
 		Integer roomBeforeEdit = deviceBeforeEdit.getRoom().getId();
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_EDIT, deviceId)
+		mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId)
 							.param("name", "Test lighting")
 							.param("deviceType", "2") // Lights
 							.param("room", "2") // Kitchen
 			   )
 			   .andDo(print())
-			   .andExpect(view().name(REDIRECT + ENDPOINT_DEVICE_LIST));
+			   .andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		// Check that the device was edited
 		Device deviceAfterEdit = deviceRepository.findById(deviceId).get();
@@ -218,7 +218,7 @@ public class DeviceControllerIntegrationTest {
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void editDevice_shouldDisplayForm_whenSubmittingFormFails() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(post(ENDPOINT_DEVICE_EDIT, deviceId)
+		mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId)
 							.param("deviceType", "2") // Lights
 							.param("room", "2") // Kitchen
 			   )
@@ -230,30 +230,32 @@ public class DeviceControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void editDevice_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(post(ENDPOINT_DEVICE_EDIT, deviceId))
+		mockMvc.perform(put(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
-	public void selectDeleteDevice_shouldDisplayConfirmationDialog_whenAdminUser() throws Exception {
+	public void confirmDeleteDevice_shouldDisplayConfirmationDialog_whenAdminUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(get(ENDPOINT_DEVICE_DELETE, deviceId))
+		mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL + "/confirmation", deviceId))
 			   .andDo(print())
-			   .andExpect(view().name("device/modals :: modalDelete")).andExpect(model().size(2))
+			   .andExpect(view().name(MODAL_DEVICE_DELETE))
+			   .andExpect(model().size(3))
 			   .andExpect(model().attribute("device", hasProperty("id", equalTo(deviceId))))
 			   .andExpect(model().attribute("device", hasProperty("name", equalTo("Lighting #3"))))
-			   .andExpect(model().attribute("actionUrl", String.format("/admin/device/%s/delete", deviceId)));
+			   .andExpect(model().attribute("actionUrl", String.format(ENDPOINT_ADMIN_DEVICES_BASE_URL + "/%s", deviceId)))
+			   .andExpect(model().attribute("actionType", "DELETE"));
 	}
 	
 	@Test
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
-	public void selectDeleteDevice_shouldBeForbidden_whenSimpleUser() throws Exception {
+	public void confirmDeleteDevice_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(get(ENDPOINT_DEVICE_DELETE, deviceId))
+		mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL + "/confirmation", deviceId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -262,9 +264,9 @@ public class DeviceControllerIntegrationTest {
 		Device savedDevice = deviceRepository.save(new Device());
 		long devicesCountBefore = deviceRepository.count();
 		Integer deviceId = savedDevice.getId();
-		mockMvc.perform(post(ENDPOINT_DEVICE_DELETE, deviceId))
+		mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId))
 			   .andDo(print())
-			   .andExpect(view().name(REDIRECT + ENDPOINT_DEVICE_LIST));
+			   .andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL));
 		
 		// Check that the selected device was deleted
 		long devicesCountAfter = deviceRepository.count();
@@ -276,9 +278,9 @@ public class DeviceControllerIntegrationTest {
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void doDeleteDevice_shouldFail_whenDeviceAssignedToUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(post(ENDPOINT_DEVICE_DELETE, deviceId))
+		mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId))
 			   .andDo(print())
-			   .andExpect(view().name(LAYOUT_ERROR_422))
+			   .andExpect(view().name(VIEW_ERROR_422))
 			   .andExpect(model().attribute("action", "delete device"))
 			   .andExpect(model().attribute("entityName", "Lighting #3"))
 			   .andExpect(model().attribute("additionalMessage", notNullValue()));
@@ -288,9 +290,9 @@ public class DeviceControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void doDeleteDevice_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer deviceId = 7;
-		mockMvc.perform(post(ENDPOINT_DEVICE_DELETE, deviceId))
+		mockMvc.perform(delete(ENDPOINT_ADMIN_DEVICES_EDIT_OR_DELETE_BASE_URL, deviceId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -298,7 +300,7 @@ public class DeviceControllerIntegrationTest {
 	public void getAllDevicesAlternativeViewStyle_shouldReturnAllAvailableDevices_whenAdminUser() throws Exception {
 		mockMvc.perform(get(ENDPOINT_DEVICE_LIST_ALL_ALTERNATIVE))
 			   .andDo(print())
-			   .andExpect(view().name(LAYOUT_DEVICE_LIST_ALTERNATIVE));
+			   .andExpect(view().name(VIEW_DEVICE_GRID));
 	}
 	
 	@Test
@@ -306,7 +308,7 @@ public class DeviceControllerIntegrationTest {
 	public void getAllDevicesAlternativeViewStyle_shouldBeForbidden_whenSimpleUser() throws Exception {
 		mockMvc.perform(get(ENDPOINT_DEVICE_LIST_ALL_ALTERNATIVE))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -317,7 +319,7 @@ public class DeviceControllerIntegrationTest {
 		Integer userId = 103;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_USER, userId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -328,7 +330,7 @@ public class DeviceControllerIntegrationTest {
 		Integer userId = 103;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_USER, userId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -338,7 +340,7 @@ public class DeviceControllerIntegrationTest {
 		Integer userId = 102;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_USER, userId))
 			   .andDo(print())
-			   .andExpect(view().name(LAYOUT_DEVICE_LIST_ALTERNATIVE))
+			   .andExpect(view().name(VIEW_DEVICE_GRID))
 			   .andExpect(model().attribute("devices", hasSize(3)))
 			   .andExpect(model().attribute("devices", contains(
 					   hasProperty("name", equalTo("Lighting #1")), 
@@ -353,7 +355,7 @@ public class DeviceControllerIntegrationTest {
 		Integer roomId = 3;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_ROOM_ALL, roomId))
 			   .andDo(print())
-			   .andExpect(view().name(LAYOUT_DEVICE_LIST_ALTERNATIVE))
+			   .andExpect(view().name(VIEW_DEVICE_GRID))
 			   .andExpect(model().attribute("devices", hasSize(2)))
 			   .andExpect(model().attribute("rooms", hasSize(3)))
 			   .andExpect(model().attribute("selectedRoom", "Bedroom"));
@@ -365,7 +367,7 @@ public class DeviceControllerIntegrationTest {
 		Integer roomId = 3;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_ROOM_ALL, roomId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -375,7 +377,7 @@ public class DeviceControllerIntegrationTest {
 		Integer roomId = 1;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_ROOM_PER_USER, userId, roomId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -385,7 +387,7 @@ public class DeviceControllerIntegrationTest {
 		Integer roomId = 1;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_ROOM_PER_USER, userId, roomId))
 			   .andDo(print())
-			   .andExpect(forwardedUrl(LAYOUT_ERROR_403));
+			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 	
 	@Test
@@ -395,7 +397,7 @@ public class DeviceControllerIntegrationTest {
 		Integer roomId = 1;
 		mockMvc.perform(get(ENDPOINT_DEVICE_PER_ROOM_PER_USER, userId, roomId))
 			   .andDo(print())
-			   .andExpect(view().name(LAYOUT_DEVICE_LIST_ALTERNATIVE))
+			   .andExpect(view().name(VIEW_DEVICE_GRID))
 			   .andExpect(model().attribute("devices", hasSize(1)))
 			   .andExpect(model().attribute("devices", contains(hasProperty("name", equalTo("Lighting #1")))))
 			   .andExpect(model().attribute("selectedRoom", "Living Room"));
@@ -407,7 +409,7 @@ public class DeviceControllerIntegrationTest {
 		Integer deviceId = 6;
 		boolean deviceStatusBefore = deviceRepository.findById(deviceId).get().isStatusOn();
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_STATUS_EDIT, 
+		mockMvc.perform(patch(ENDPOINT_DEVICE_STATUS_EDIT,
 								String.valueOf(deviceId), 
 								String.valueOf(!deviceStatusBefore)
 							)
@@ -428,7 +430,7 @@ public class DeviceControllerIntegrationTest {
 		Integer deviceId = 7;
 		boolean deviceStatusBefore = deviceRepository.findById(deviceId).get().isStatusOn();
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_STATUS_EDIT, 
+		mockMvc.perform(patch(ENDPOINT_DEVICE_STATUS_EDIT,
 								String.valueOf(deviceId), 
 								String.valueOf(!deviceStatusBefore)
 							)
@@ -451,7 +453,7 @@ public class DeviceControllerIntegrationTest {
 		Integer deviceId = 6; // deviceId should be controlled only by ADMIN and testuser2@foo.com!
 		boolean deviceStatusBefore = deviceRepository.findById(deviceId).get().isStatusOn();
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_STATUS_EDIT, 
+		mockMvc.perform(patch(ENDPOINT_DEVICE_STATUS_EDIT,
 								String.valueOf(deviceId), 
 								String.valueOf(!deviceStatusBefore)
 							)
@@ -473,7 +475,7 @@ public class DeviceControllerIntegrationTest {
 				deviceRepository.findById(deviceId).get().getInformationValue()
 		);
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_VALUE_EDIT, 
+		mockMvc.perform(patch(ENDPOINT_DEVICE_VALUE_EDIT,
 								String.valueOf(deviceId), 
 								String.valueOf(deviceInformationValueBefore + 1)
 							)
@@ -498,7 +500,7 @@ public class DeviceControllerIntegrationTest {
 				deviceRepository.findById(deviceId).get().getInformationValue()
 		);
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_VALUE_EDIT, 
+		mockMvc.perform(patch(ENDPOINT_DEVICE_VALUE_EDIT,
 								String.valueOf(deviceId), 
 								String.valueOf(deviceInformationValueBefore + 1)
 							)
@@ -525,7 +527,7 @@ public class DeviceControllerIntegrationTest {
 				deviceRepository.findById(deviceId).get().getInformationValue()
 		);
 		
-		mockMvc.perform(post(ENDPOINT_DEVICE_VALUE_EDIT, 
+		mockMvc.perform(patch(ENDPOINT_DEVICE_VALUE_EDIT,
 								String.valueOf(deviceId), 
 								String.valueOf(deviceInformationValueBefore + 1)
 							)

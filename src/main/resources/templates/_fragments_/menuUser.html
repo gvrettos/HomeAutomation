@@ -7,7 +7,7 @@
             </li>
             <li>
                 <a href="#" 
-                   th:href="@{/device/user/{id}(id=${loggedInUser.getId()})}">
+                   th:href="@{/devices/user/{id}(id=${loggedInUser.getId()})}">
                     <i class="fa fa-cogs"></i>
                     <span>All rooms</span>
                 </a>
@@ -21,7 +21,7 @@
                     <ul>
 						<li th:each="room : ${rooms}" >
 							<a href="#" 
-							   th:href="@{/device/user/{userId}/room/{roomId}(userId=${loggedInUser.getId()}, roomId=${room.getId()})}" 
+							   th:href="@{/devices/user/{userId}/room/{roomId}(userId=${loggedInUser.getId()}, roomId=${room.getId()})}"
 							   th:text="${room.getName()}">
 							   Room
 							</a>

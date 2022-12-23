@@ -50,6 +50,14 @@ public class IndexControllerTest {
 	@MockBean
 	@Qualifier("roomServiceImpl")
 	private RoomService roomService;
+
+	private static final String ENDPOINT_ROOT = "/";
+	private static final String VIEW_INDEX = "index";
+	private static final String ENDPOINT_INDEX = ENDPOINT_ROOT + VIEW_INDEX;
+	private static final String VIEW_LOGIN = "login";
+	private static final String ENDPOINT_LOGIN = ENDPOINT_ROOT + VIEW_LOGIN;
+	private static final String VIEW_REGISTRATION = "registration";
+	private static final String ENDPOINT_REGISTRATION = ENDPOINT_ROOT + VIEW_REGISTRATION;
 	
 	private Person admin;
 	private Person simpleUser;
@@ -80,32 +88,32 @@ public class IndexControllerTest {
 	@Test
 	@WithMockUser
 	public void home_Should_LoadIndexPage_When_AdminLoggedInAndRequestingIndex() throws Exception {
-		loadIndexPageWhenUserLoggedIn("/index", admin, allRooms);
+		loadIndexPageWhenUserLoggedIn(ENDPOINT_INDEX, admin, allRooms);
 	}
 	
 	@Test
 	@WithMockUser
 	public void home_Should_LoadIndexPage_When_AdminLoggedInAndRequestingRoot() throws Exception {
-		loadIndexPageWhenUserLoggedIn("/", admin, allRooms);
+		loadIndexPageWhenUserLoggedIn(ENDPOINT_ROOT, admin, allRooms);
 	}
 	
 	@Test
 	@WithMockUser
 	public void home_Should_LoadIndexPage1_When_SimpleUserLoggedInAndRequestingIndex() throws Exception {
-		loadIndexPageWhenUserLoggedIn("/index", simpleUser, simpleUserRooms);
+		loadIndexPageWhenUserLoggedIn(ENDPOINT_INDEX, simpleUser, simpleUserRooms);
 	}
 	
 	@Test
 	@WithMockUser
 	public void home_Should_LoadIndexPage_When_SimpleUserLoggedInAndRequestingRoot() throws Exception {
-		loadIndexPageWhenUserLoggedIn("/", simpleUser, simpleUserRooms);
+		loadIndexPageWhenUserLoggedIn(ENDPOINT_ROOT, simpleUser, simpleUserRooms);
 	}
 	
 	@Test
 	@WithMockUser // TODO the /login URL should normally be permitted without a mock user
 	public void login_Should_LoadLoginPage_When_RequestingLoginPage() throws Exception {
 		// when - then
-		this.mockMvc.perform(get("/login").with(csrf()))
+		this.mockMvc.perform(get(ENDPOINT_LOGIN).with(csrf()))
 					.andExpect(status().isOk())
 					.andExpect(content().string(containsString("<h3>Login with Username and Password</h3>")));
 	}
@@ -114,23 +122,23 @@ public class IndexControllerTest {
 	@WithMockUser // TODO the /registration URL should be permitted without a mock user
 	public void registration_Should_LoadRegistrationPage_When_RequestingRegistrationPage() throws Exception {
 		// when - then
-		this.mockMvc.perform(get("/registration"))
+		this.mockMvc.perform(get(ENDPOINT_REGISTRATION))
 					.andExpect(status().isOk())
-					.andExpect(view().name("registration"));
+					.andExpect(view().name(VIEW_REGISTRATION));
 	}
 	
 	@Test
 	@WithMockUser // TODO the /registration URL should normally be permitted without a mock user
 	public void registration_Should_SaveNewUser_When_SubmittedFromRegistrationPage() throws Exception {
 		// when - then
-		this.mockMvc.perform(post("/registration")
+		this.mockMvc.perform(post(ENDPOINT_REGISTRATION)
 								.with(csrf())
 								.param("name", "user2")
 								.param("surname", "surname")
 								.param("email", "user2@foo.com")
 					)
-					.andExpect(redirectedUrl("/index"))
-					.andExpect(view().name("redirect:/index"));
+					.andExpect(redirectedUrl(ENDPOINT_INDEX))
+					.andExpect(view().name("redirect:" + ENDPOINT_INDEX));
 	}
 	
 	private void loadIndexPageWhenUserLoggedIn(String url, Person loggedInUser, Set<Room> rooms) throws Exception {
@@ -143,7 +151,7 @@ public class IndexControllerTest {
 					.andExpect(status().isOk()) 
 					.andExpect(model().attribute("loggedInUser", loggedInUser))
 					.andExpect(model().attribute("rooms", rooms))
-					.andExpect(view().name("index"));
+					.andExpect(view().name(VIEW_INDEX));
 	}
 	
 }

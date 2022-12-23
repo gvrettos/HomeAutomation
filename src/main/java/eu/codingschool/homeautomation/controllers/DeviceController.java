@@ -5,16 +5,14 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import eu.codingschool.homeautomation.model.Device;
 import eu.codingschool.homeautomation.model.DeviceType;
@@ -25,10 +23,23 @@ import eu.codingschool.homeautomation.services.DeviceTypeService;
 import eu.codingschool.homeautomation.services.PersonService;
 import eu.codingschool.homeautomation.services.RoomService;
 import eu.codingschool.homeautomation.validators.DeviceValidator;
+import org.springframework.web.servlet.View;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class DeviceController {
-	
+
+	private static final String ENDPOINT_DEVICES_BASE_URL = "/devices";
+	private static final String ENDPOINT_ADMIN_DEVICES_BASE_URL = "/admin" + ENDPOINT_DEVICES_BASE_URL;
+	private static final String REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL = "redirect:" + ENDPOINT_ADMIN_DEVICES_BASE_URL;
+
+	private static final String MODAL_DEVICE_NEW_OR_EDIT = "device/modals :: modalNewOrEdit";
+	private static final String MODAL_DEVICE_DELETE = "device/modals :: modalDelete";
+
+	private static final String VIEW_DEVICE_LIST = "device/list";
+	public static final String VIEW_DEVICE_GRID = "device/grid";
+
 	@Autowired
 	private PersonService personService;
 	
@@ -45,40 +56,40 @@ public class DeviceController {
 	private DeviceValidator deviceValidator;
 	
 	
-	@RequestMapping(value = "/admin/device/list", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL)
 	public String getAdminDevicesList(Model model) {
 		getAllDevices(model);
-		return "device/list";
+		return VIEW_DEVICE_LIST;
 	}
 	
 	/**
-	 * Display form for new device type with empty fields.
+	 * Display form for new device with empty fields.
 	 */
-	@RequestMapping(value = "/admin/device/new", method = RequestMethod.GET)
+	@PostMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/form")
 	public String newDevice(Model model) {
 		model.addAttribute("device", new Device());
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
 		Set<Room> allRooms = roomService.findAll();
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
-		model.addAttribute("actionUrl", "/admin/device/new");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICES_BASE_URL);
+		model.addAttribute("actionType", "POST");
 		model.addAttribute("modalTitle", "New");
-		return "device/modals :: modalNewOrEdit";
+		return MODAL_DEVICE_NEW_OR_EDIT;
 	}
 	
 	/**
-	 * Save a new device type by submitting the form.
+	 * Save a new device by submitting the form.
 	 */
-	@RequestMapping(value = "/admin/device/new", method = RequestMethod.POST)
-	public String addDevice(@ModelAttribute("device") Device device, BindingResult result, 
-			ModelMap model) {
+	@PostMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL)
+	public String addDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
 		return saveOrUpdateDevice(device, result);
 	}
 	
 	/**
-	 * Display form for an already saved device type with pre-filled fields.
+	 * Display form for an already saved device with pre-filled fields.
 	 */
-	@RequestMapping(value = "/admin/device/{id}/edit", method = RequestMethod.GET)
+	@PutMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}/form")
 	public String viewDevice(@PathVariable(value="id") int id, Model model) {
 		Device device = deviceService.findById(id);
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
@@ -86,34 +97,36 @@ public class DeviceController {
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
 		model.addAttribute("device", device);
-		model.addAttribute("actionUrl", "/admin/device/" + id + "/edit");
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICES_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "PUT");
 		model.addAttribute("modalTitle", "Edit");
-		return "device/modals :: modalNewOrEdit";
+		return MODAL_DEVICE_NEW_OR_EDIT;
 	}
 	
 	/**
-	 * Update a device type by submitting the form.
+	 * Update a device by submitting the form.
 	 */
-	@RequestMapping(value = "/admin/device/{id}/edit", method = RequestMethod.POST)
+	@PutMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}")
 	public String editDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
 		return saveOrUpdateDevice(device, result);
 	}
 	
 	/**
-	 * Display a confirmation dialog before deleting a device type.
+	 * Display a confirmation dialog before deleting a device.
 	 */
-	@RequestMapping(value = "/admin/device/{id}/delete", method = RequestMethod.GET)
-	public String confrimDeleteDevice(@PathVariable(value="id") int id, Model model) {
+	@DeleteMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}/confirmation")
+	public String confirmDeleteDevice(@PathVariable(value="id") int id, Model model) {
 		Device device = deviceService.findById(id);
 		model.addAttribute("device", device);
-		model.addAttribute("actionUrl", "/admin/device/" + id + "/delete");
-		return "device/modals :: modalDelete";
+		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICES_BASE_URL + "/" + id);
+		model.addAttribute("actionType", "DELETE");
+		return MODAL_DEVICE_DELETE;
 	}
 	
 	/**
-	 * Delete the device type after accepting the deletion confirmation.
+	 * Delete the device after accepting the deletion confirmation.
 	 */
-	@RequestMapping(value = "/admin/device/{id}/delete", method = RequestMethod.POST)
+	@DeleteMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}")
 	public String doDeleteDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
 		try {
 			device = deviceService.findById(device.getId());
@@ -124,7 +137,7 @@ public class DeviceController {
 			model.addAttribute("additionalMessage", "Please check if the device has been assigned to any user. Only unassigned devices can be deleted.");
 			return "/error/422";
 		}
-		return "redirect:/admin/device/list";
+		return REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL;
 	}
 	
 	private String saveOrUpdateDevice(Device device, BindingResult result) {
@@ -132,11 +145,11 @@ public class DeviceController {
 		
 		if (result.hasErrors()) {
 			// reload the same page fragment
-			return "device/modals :: modalNewOrEdit";
+			return MODAL_DEVICE_NEW_OR_EDIT;
 		}
 		
 		deviceService.save(device);
-		return "redirect:/admin/device/list";
+		return REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL;
 	}
 	
 	private void getAllDevices(Model model) {
@@ -151,18 +164,18 @@ public class DeviceController {
 	}
 	
 	/**
-	 * Display the devices that can be operated by an ADMIN
+	 * Display the devices that can be operated by an ADMIN only
 	 */
-	@RequestMapping(value = "/admin/device/user/all", method = RequestMethod.GET)
+	@GetMapping(value =  ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all")
 	public String showAdminDevices(Model model) {
 		getAllDevices(model);
-		return "userDevices/grid";
+		return VIEW_DEVICE_GRID;
 	}
-	
+
 	/**
 	 * Display the devices that can be operated by any USER
 	 */
-	@RequestMapping(value = "/device/user/{id}", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_DEVICES_BASE_URL + "/user/{id}")
 	public String showUserDevices(@PathVariable(value="id") int userId, Model model) {
 		
 		UserDetails loggedInUserDetails = personService.getLoggedInUser();
@@ -176,13 +189,13 @@ public class DeviceController {
     	
     	populateSideMenu(model, loggedInUserDetails);
     	model.addAttribute("devices", deviceService.findByPersonsId(userId));
-		return "userDevices/grid";
+		return VIEW_DEVICE_GRID;
 	}
 	
 	/**
 	 * Display all the devices for a specific room
 	 */
-	@RequestMapping(value = "/admin/device/user/all/room/{roomId}", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all/room/{roomId}")
 	public String showAdminDevicesPerRoom(@PathVariable(value="roomId") int roomId, Model model) {
 		
 		UserDetails loggedInUser = personService.getLoggedInUser();
@@ -194,13 +207,13 @@ public class DeviceController {
 		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
 		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
-		return "userDevices/grid";
+		return VIEW_DEVICE_GRID;
 	}
 	
 	/**
 	 * Display the devices that are assigned to a USER for a specific room
 	 */
-	@RequestMapping(value = "/device/user/{userId}/room/{roomId}", method = RequestMethod.GET)
+	@GetMapping(value = ENDPOINT_DEVICES_BASE_URL + "/user/{userId}/room/{roomId}")
 	public String showUserDevicesPerRoom(
 			@PathVariable(value="userId") int userId, 
 			@PathVariable(value="roomId") int roomId, 
@@ -218,39 +231,41 @@ public class DeviceController {
 		populateSideMenu(model, loggedInUserDetails);
 		model.addAttribute("devices", deviceService.findByPersonsIdAndRoomId(userId, roomId));
 		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
-		return "userDevices/grid";
+		return VIEW_DEVICE_GRID;
 	}
 	
 	/**
 	 * Set the device on/off.
 	 */
 	// FIXME A simple user can update a device which is assigned to another user and not them!
-	@RequestMapping(value = "/device/{id}/updateStatus/{status}", method = RequestMethod.POST)
+	@PatchMapping(value = ENDPOINT_DEVICES_BASE_URL + "/{id}/updateStatus/{status}")
 	public String updateDeviceStatus(
 			@PathVariable(value="id") int deviceId, 
-			@PathVariable(value="status") boolean status) {
+			@PathVariable(value="status") boolean status,
+			HttpServletRequest request) {
 		
 		Device device = deviceService.findById(deviceId);
 		device.setStatusOn(status);
 		deviceService.save(device);
 		
-		return redirectPage();
+		return redirectPage(request);
 	}
 	
 	/**
 	 * Increase/Decrease the device's information value. 
 	 */
 	// FIXME A simple user can update a device which is assigned to another user and not them!
-	@RequestMapping(value = "/device/{id}/updateValue/{value}", method = RequestMethod.POST)
+	@PatchMapping(value = ENDPOINT_DEVICES_BASE_URL + "/{id}/updateValue/{value}")
 	public String updateDeviceInformationValue(
 			@PathVariable(value="id") int deviceId, 
-			@PathVariable(value="value") String informationValue) {
+			@PathVariable(value="value") String informationValue,
+			HttpServletRequest request) {
 		
 		Device device = deviceService.findById(deviceId);
 		device.setInformationValue(informationValue);
 		deviceService.save(device);
 		
-		return redirectPage();
+		return redirectPage(request);
 	}
 	
 	private void populateSideMenu(Model model, UserDetails loggedInUserDetails) {
@@ -262,17 +277,25 @@ public class DeviceController {
 		}
 		model.addAttribute("loggedInUser", loggedInUser);
 	}
-	
-	private String redirectPage() {
+
+	// FIXME the actual redirection URLs may be different
+	// FIXME E.g. after ADMIN updates the status of a device in a specific room we do not want to return them back to all devices
+	private String redirectPage(HttpServletRequest request) {
 		UserDetails loggedInUser = personService.getLoggedInUser();
 		if (loggedInUser != null && loggedInUser.getUsername() != null) {
 			Person loggedInPerson = personService.findByEmail(loggedInUser.getUsername());
 			if (loggedInPerson != null) {
+				// We set the response status to 303: See Other as a workaround to make the redirection from a PATCH
+				// method to a GET work.
+				// When using XHR requests other than GET or POST and redirecting after the request then some browsers
+				// will follow the redirect using the original request method. This may lead to undesirable behavior
+				// such as a double PATCH here.
+				request.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.SEE_OTHER);
 				if ("ADMIN".equals(loggedInPerson.getRole())) {
-					return "redirect:/admin/device/user/all";
+					return "redirect:" + ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all";
 				}
 				else if ("USER".equals(loggedInPerson.getRole())) {
-					return "redirect:/device/user/" + loggedInPerson.getId();
+					return "redirect:" + ENDPOINT_DEVICES_BASE_URL + "/user/" + loggedInPerson.getId();
 				}
 			}
 		}

@@ -43,13 +43,13 @@ public class IndexControllerIntegrationTest {
 
     private MockMvc mockMvc;
     
-    private static final String URL_ROOT = "/";
+    private static final String ENDPOINT_ROOT = "/";
     private static final String VIEW_INDEX = "index";
-    private static final String URL_INDEX = URL_ROOT + VIEW_INDEX;
+    private static final String ENDPOINT_INDEX = ENDPOINT_ROOT + VIEW_INDEX;
     private static final String VIEW_LOGIN = "login";
-    private static final String URL_LOGIN = URL_ROOT + VIEW_LOGIN;
+    private static final String ENDPOINT_LOGIN = ENDPOINT_ROOT + VIEW_LOGIN;
     private static final String VIEW_REGISTRATION = "registration";
-    private static final String URL_REGISTRATION = URL_ROOT + VIEW_REGISTRATION;
+    private static final String ENDPOINT_REGISTRATION = ENDPOINT_ROOT + VIEW_REGISTRATION;
     
     // User inserted in database via test/resources/test-data-population.sql
     private static final String MOCK_USER = "testuser1@foo.com";
@@ -65,7 +65,7 @@ public class IndexControllerIntegrationTest {
 	@Test
 	@WithMockUser(username = MOCK_USER)
 	public void home_shouldLoadIndexPage_whenRequestingRootPage() throws Exception {
-		mockMvc.perform(get(URL_ROOT))
+		mockMvc.perform(get(ENDPOINT_ROOT))
 			   .andDo(print())
 			   .andExpect(view().name(VIEW_INDEX));
 	}
@@ -73,7 +73,7 @@ public class IndexControllerIntegrationTest {
 	@Test
 	@WithMockUser(username = MOCK_USER)
 	public void home_shouldLoadIndexPage_whenRequestingIndexPage() throws Exception {
-		mockMvc.perform(get(URL_INDEX))
+		mockMvc.perform(get(ENDPOINT_INDEX))
 		   	   .andDo(print())
 		   	   .andExpect(view().name(VIEW_INDEX));
 	}
@@ -81,7 +81,7 @@ public class IndexControllerIntegrationTest {
 	@Test
 	@WithMockUser(username = MOCK_USER)
 	public void login_shouldLoadLoginPage_whenRequestingLoginPage() throws Exception {
-		mockMvc.perform(get(URL_LOGIN))
+		mockMvc.perform(get(ENDPOINT_LOGIN))
 		   	   .andDo(print())
 		   	   .andExpect(view().name(VIEW_LOGIN));
 	}
@@ -89,26 +89,26 @@ public class IndexControllerIntegrationTest {
 	@Test
 	@WithMockUser(username = MOCK_USER)
 	public void registration_shouldLoadRegistrationPage_whenRequestingRegistrationPage() throws Exception {
-		mockMvc.perform(get(URL_REGISTRATION))
+		mockMvc.perform(get(ENDPOINT_REGISTRATION))
 		   	   .andDo(print())
 		   	   .andExpect(view().name(VIEW_REGISTRATION));
 	}
 	
 	@Test
 	public void registration_shouldLoadIndexPage_whenSubmittingRegistrationPageSucceeds() throws Exception {
-		mockMvc.perform(post(URL_REGISTRATION)
+		mockMvc.perform(post(ENDPOINT_REGISTRATION)
 							.param("name", "TestUser")
 							.param("surname", "TestUserSurname")
 							.param("email", "testuser@ha.com")
 							.param("password", "***")
 					   )
 					   .andDo(print())
-					   .andExpect(view().name("redirect:" + URL_INDEX));
+					   .andExpect(view().name("redirect:" + ENDPOINT_INDEX));
 	}
 	
 	@Test
 	public void registration_shouldLoadRegistrationPage_whenSubmittingRegistrationPageFails() throws Exception {
-		mockMvc.perform(post(URL_REGISTRATION)
+		mockMvc.perform(post(ENDPOINT_REGISTRATION)
 							.param("name", "TestUser")
 							.param("surname", "TestUserSurname")
 							.param("email", "not_a_valid_email")
