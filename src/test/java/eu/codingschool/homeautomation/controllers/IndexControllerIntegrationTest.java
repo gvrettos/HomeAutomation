@@ -5,7 +5,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.Before;
@@ -66,7 +66,7 @@ public class IndexControllerIntegrationTest {
 	@WithMockUser(username = MOCK_USER)
 	public void home_shouldLoadIndexPage_whenRequestingRootPage() throws Exception {
 		mockMvc.perform(get(ENDPOINT_ROOT))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(VIEW_INDEX));
 	}
 	
@@ -74,7 +74,7 @@ public class IndexControllerIntegrationTest {
 	@WithMockUser(username = MOCK_USER)
 	public void home_shouldLoadIndexPage_whenRequestingIndexPage() throws Exception {
 		mockMvc.perform(get(ENDPOINT_INDEX))
-		   	   .andDo(print())
+		   	   .andExpect(status().isOk())
 		   	   .andExpect(view().name(VIEW_INDEX));
 	}
 
@@ -82,15 +82,14 @@ public class IndexControllerIntegrationTest {
 	@WithMockUser(username = MOCK_USER)
 	public void login_shouldLoadLoginPage_whenRequestingLoginPage() throws Exception {
 		mockMvc.perform(get(ENDPOINT_LOGIN))
-		   	   .andDo(print())
+		   	   .andExpect(status().isOk())
 		   	   .andExpect(view().name(VIEW_LOGIN));
 	}
 	
 	@Test
-	@WithMockUser(username = MOCK_USER)
 	public void registration_shouldLoadRegistrationPage_whenRequestingRegistrationPage() throws Exception {
 		mockMvc.perform(get(ENDPOINT_REGISTRATION))
-		   	   .andDo(print())
+		   	   .andExpect(status().isOk())
 		   	   .andExpect(view().name(VIEW_REGISTRATION));
 	}
 	
@@ -102,7 +101,7 @@ public class IndexControllerIntegrationTest {
 							.param("email", "testuser@ha.com")
 							.param("password", "***")
 					   )
-					   .andDo(print())
+					   .andExpect(status().is3xxRedirection())
 					   .andExpect(view().name("redirect:" + ENDPOINT_INDEX));
 	}
 	
@@ -114,7 +113,7 @@ public class IndexControllerIntegrationTest {
 							.param("email", "not_a_valid_email")
 							.param("password", "***")
 					   )
-					   .andDo(print())
+					   .andExpect(status().isOk())
 					   .andExpect(view().name(VIEW_REGISTRATION));
 	}
 }

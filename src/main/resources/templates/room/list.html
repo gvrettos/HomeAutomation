@@ -30,7 +30,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:each="room, i : ${room}">
+					<tr th:each="room, i : ${rooms}">
 						<td th:text="${i.count}"></td>
 						<!-- <td th:text="${room.getId()}">ID</td> -->
 						<td th:text="${room.getName()}">Name of the Room</td>

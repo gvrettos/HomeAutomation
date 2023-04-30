@@ -57,8 +57,9 @@ public class IndexController {
 
 	@GetMapping(value = ENDPOINT_LOGIN)
 	public String login(Model model, String error, String logout) {
-		if (error != null)
+		if (error != null) {
 			model.addAttribute("error", "Your username and password is invalid.");
+		}
 
 		if (logout != null) {
 			model.addAttribute("message", "You have been logged out successfully.");
@@ -74,7 +75,7 @@ public class IndexController {
 	}
 
 	@PostMapping(value = ENDPOINT_REGISTRATION)
-	public String registration(@ModelAttribute("user") Person person, BindingResult bindingResult, Model model) {
+	public String registration(@ModelAttribute("user") Person person, BindingResult bindingResult) {
 		personValidator.validate(person, bindingResult);
 
 		if (bindingResult.hasErrors()) {
@@ -85,12 +86,12 @@ public class IndexController {
 	}
 	
 	@GetMapping(value = "/error/403")
-	public String error403(Model model) {
+	public String error403() {
 		return "error/403";
 	}
 	
 	@GetMapping(value = "/error/422")
-	public String error422(Model model) {
+	public String error422() {
 		return "error/422";
 	}
 

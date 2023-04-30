@@ -1,7 +1,5 @@
 package eu.codingschool.homeautomation.controllers;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,9 +39,6 @@ public class RoomController {
 
 	@GetMapping(value = ENDPOINT_ROOMS_BASE_URL)
 	public String getRooms(Model model) {
-		Set<Room> room = roomService.findAll();
-		model.addAttribute("room", room);
-		
 		String email = "";
         Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (userDetails instanceof UserDetails) {
@@ -71,7 +66,7 @@ public class RoomController {
 	 * Save a new room by submitting the form.
 	 */
 	@PostMapping(value = ENDPOINT_ROOMS_BASE_URL)
-	public String addRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
+	public String addRoom(@ModelAttribute("room") Room room, BindingResult result) {
 		return saveOrUpdateRoom(room, result);
 	}
 
@@ -92,7 +87,7 @@ public class RoomController {
 	 * Update a room by submitting the form.
 	 */
 	@PutMapping(value = ENDPOINT_ROOMS_BASE_URL + "/{id}")
-	public String editRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
+	public String editRoom(@ModelAttribute("room") Room room, BindingResult result) {
 		return saveOrUpdateRoom(room, result);
 	}
 
@@ -112,11 +107,12 @@ public class RoomController {
 	 * Delete the room after accepting the deletion confirmation.
 	 */
 	@DeleteMapping(value = ENDPOINT_ROOMS_BASE_URL + "/{id}")
-	public String doDeleteRoom(@ModelAttribute("room") Room room, BindingResult result, ModelMap model) {
+	public String doDeleteRoom(@ModelAttribute("room") Room room, ModelMap model) {
 		try {
 			room = roomService.findById(room.getId());
 			roomService.delete(room);
 		} catch (DataIntegrityViolationException ex) {
+			// FIXME this will return statusCode = 200 OK which is not correct
 			model.addAttribute("action", "delete room");
 			model.addAttribute("entityName", room.getName());
 			model.addAttribute("additionalMessage", "Please check if there are any assigned devices to this room. Only free rooms can be deleted.");
