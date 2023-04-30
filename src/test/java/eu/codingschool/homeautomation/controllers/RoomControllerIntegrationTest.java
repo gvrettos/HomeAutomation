@@ -11,9 +11,9 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.Before;
@@ -80,7 +80,7 @@ public class RoomControllerIntegrationTest {
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void getRooms_shouldReturnAllRooms_whenAdminUser() throws Exception {
 		mockMvc.perform(get(ENDPOINT_ADMIN_ROOMS_BASE_URL))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(VIEW_ROOM_LIST));
 	}
 
@@ -88,7 +88,7 @@ public class RoomControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void getRooms_shouldBeForbidden_whenSimpleUser() throws Exception {
 		mockMvc.perform(get(ENDPOINT_ADMIN_ROOMS_BASE_URL))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -96,7 +96,7 @@ public class RoomControllerIntegrationTest {
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void viewNewRoomForm_shouldDisplayForm_whenAdminUser() throws Exception {
 		mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL + "/form"))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 	}
 
@@ -104,7 +104,7 @@ public class RoomControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void viewNewRoomForm_shouldBeForbidden_whenSimpleUser() throws Exception {
 		mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL + "/form"))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -116,7 +116,7 @@ public class RoomControllerIntegrationTest {
 		mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL)
 							.param("name", "Another room")
 				)
-				.andDo(print())
+				.andExpect(status().is3xxRedirection())
 				.andExpect(view().name(REDIRECT + ENDPOINT_ADMIN_ROOMS_BASE_URL));
 
 		long roomsCountAfter = roomRepository.count();
@@ -129,7 +129,7 @@ public class RoomControllerIntegrationTest {
 		mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL)
 							.param("name", "")
 			   )
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 	}
 
@@ -137,7 +137,7 @@ public class RoomControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void createNewRoom_shouldBeForbidden_whenSimpleUser() throws Exception {
 		mockMvc.perform(post(ENDPOINT_ADMIN_ROOMS_BASE_URL))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -146,7 +146,7 @@ public class RoomControllerIntegrationTest {
 	public void viewEditRoomForm_shouldDisplayForm_whenAdminUser() throws Exception {
 		Integer roomId = 3;
 		mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL + "/form", roomId))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT))
 			   .andExpect(model().size(4))
 			   .andExpect(model().attribute("room", isA(Room.class)))
@@ -162,7 +162,7 @@ public class RoomControllerIntegrationTest {
 	public void viewEditRoomForm_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer roomId = 3;
 		mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL + "/form", roomId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -176,7 +176,7 @@ public class RoomControllerIntegrationTest {
 		mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId)
 							.param("name", "Another room")
 				)
-				.andDo(print())
+				.andExpect(status().is3xxRedirection())
 				.andExpect(view().name(REDIRECT + ENDPOINT_ADMIN_ROOMS_BASE_URL));
 
 		// Check that the room was edited
@@ -193,7 +193,7 @@ public class RoomControllerIntegrationTest {
 		mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId)
 							.param("name", "")
 				)
-				.andDo(print())
+				.andExpect(status().isOk())
 				.andExpect(view().name(MODAL_ROOM_NEW_OR_EDIT));
 	}
 
@@ -202,7 +202,7 @@ public class RoomControllerIntegrationTest {
 	public void editRoom_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer roomId = 3;
 		mockMvc.perform(put(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -211,7 +211,7 @@ public class RoomControllerIntegrationTest {
 	public void confirmDeleteRoom_shouldDisplayConfirmationDialog_whenAdminUser() throws Exception {
 		Integer roomId = 3;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL + "/confirmation", roomId))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(MODAL_ROOM_DELETE))
 			   .andExpect(model().size(3))
 			   .andExpect(model().attribute("room", hasProperty("id", equalTo(roomId))))
@@ -225,7 +225,7 @@ public class RoomControllerIntegrationTest {
 	public void confirmDeleteRoom_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer roomId = 3;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL + "/confirmation", roomId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -236,7 +236,7 @@ public class RoomControllerIntegrationTest {
 		long devicesCountBefore = roomRepository.count();
 		Integer roomId = savedRoom.getId();
 		mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId))
-			   .andDo(print())
+			   .andExpect(status().is3xxRedirection())
 			   .andExpect(view().name(REDIRECT + ENDPOINT_ADMIN_ROOMS_BASE_URL));
 
 		// Check that the selected room was deleted
@@ -250,7 +250,7 @@ public class RoomControllerIntegrationTest {
 	public void doDeleteRoom_shouldFail_whenRoomUsedByDevice() throws Exception {
 		Integer deviceId = 3;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, deviceId))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(VIEW_ERROR_422))
 			   .andExpect(model().attribute("action", "delete room"))
 			   .andExpect(model().attribute("entityName", "Bedroom"))
@@ -262,7 +262,7 @@ public class RoomControllerIntegrationTest {
 	public void doDeleteRoom_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer roomId = 3;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_ROOMS_EDIT_OR_DELETE_BASE_URL, roomId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 

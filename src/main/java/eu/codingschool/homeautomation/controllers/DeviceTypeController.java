@@ -73,8 +73,7 @@ public class DeviceTypeController {
 	 * Save a new device type by submitting the form.
 	 */
 	@PostMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL)
-	public String addDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result,
-			ModelMap model) {
+	public String addDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result) {
 		return saveOrUpdateDeviceType(deviceType, result);
 	}
 	
@@ -95,8 +94,7 @@ public class DeviceTypeController {
 	 * Update a device type by submitting the form.
 	 */
 	@PutMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/{id}")
-	public String editDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, 
-			ModelMap model) {
+	public String editDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result) {
 		return saveOrUpdateDeviceType(deviceType, result);
 	}
 	
@@ -116,9 +114,7 @@ public class DeviceTypeController {
 	 * Delete the device type after accepting the deletion confirmation.
 	 */
 	@DeleteMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL + "/{id}")
-	public String doDeleteDeviceType(
-			@ModelAttribute("deviceType") DeviceType deviceType, BindingResult result, ModelMap model) {
-		
+	public String doDeleteDeviceType(@ModelAttribute("deviceType") DeviceType deviceType, ModelMap model) {
 		try {
 			deviceType = deviceTypeService.findById(deviceType.getId());
 			deviceTypeService.delete(deviceType);

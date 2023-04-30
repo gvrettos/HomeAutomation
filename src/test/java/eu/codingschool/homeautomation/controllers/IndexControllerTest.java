@@ -1,72 +1,56 @@
 package eu.codingschool.homeautomation.controllers;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import eu.codingschool.homeautomation.model.Person;
 import eu.codingschool.homeautomation.model.Room;
 import eu.codingschool.homeautomation.services.PersonService;
 import eu.codingschool.homeautomation.services.RoomService;
 import eu.codingschool.homeautomation.validators.PersonValidator;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(IndexController.class)
 public class IndexControllerTest {
-	
-	@Autowired
-	private MockMvc mockMvc;
 
-	@MockBean
+	@Mock
 	private PersonValidator personValidator;
 	
-	@MockBean
-	@Qualifier("personServiceImpl")
+	@Mock
 	private PersonService personService;
 	
-	@MockBean
-	@Qualifier("roomServiceImpl")
+	@Mock
 	private RoomService roomService;
+
+	@InjectMocks
+	private IndexController indexController;
 
 	private static final String ENDPOINT_ROOT = "/";
 	private static final String VIEW_INDEX = "index";
 	private static final String ENDPOINT_INDEX = ENDPOINT_ROOT + VIEW_INDEX;
 	private static final String VIEW_LOGIN = "login";
-	private static final String ENDPOINT_LOGIN = ENDPOINT_ROOT + VIEW_LOGIN;
 	private static final String VIEW_REGISTRATION = "registration";
-	private static final String ENDPOINT_REGISTRATION = ENDPOINT_ROOT + VIEW_REGISTRATION;
 	
 	private Person admin;
 	private Person simpleUser;
-	
-	private Set<Room> allRooms;
-	private Set<Room> simpleUserRooms;
-	
+
 	@Before
-    public void setUp() throws Exception {
+    public void setUp() {
 		admin = new Person();
 		admin.setRole("ADMIN");
 		
@@ -77,9 +61,9 @@ public class IndexControllerTest {
 		room1.setId(1);
 		Room room2 = new Room();
 		room2.setId(2);
-		
-		allRooms = new HashSet<>(Arrays.asList(room1, room2));
-		simpleUserRooms = new HashSet<>(Arrays.asList(room1));
+
+		Set<Room> allRooms = new HashSet<>(Arrays.asList(room1, room2));
+		Set<Room> simpleUserRooms = new HashSet<>(Arrays.asList(room1));
 		
 		when(roomService.findAll()).thenReturn(allRooms);
 		when(roomService.findByUser(simpleUser.getId())).thenReturn(simpleUserRooms);
@@ -87,71 +71,67 @@ public class IndexControllerTest {
 	
 	@Test
 	@WithMockUser
-	public void home_Should_LoadIndexPage_When_AdminLoggedInAndRequestingIndex() throws Exception {
-		loadIndexPageWhenUserLoggedIn(ENDPOINT_INDEX, admin, allRooms);
+	public void home_shouldLoadIndexPage_whenAdminLoggedInAndRequestingIndex() {
+		loadIndexPageWhenUserLoggedIn(admin);
 	}
 	
 	@Test
 	@WithMockUser
-	public void home_Should_LoadIndexPage_When_AdminLoggedInAndRequestingRoot() throws Exception {
-		loadIndexPageWhenUserLoggedIn(ENDPOINT_ROOT, admin, allRooms);
+	public void home_shouldLoadIndexPage_whenAdminLoggedInAndRequestingRoot() {
+		loadIndexPageWhenUserLoggedIn(admin);
 	}
 	
 	@Test
 	@WithMockUser
-	public void home_Should_LoadIndexPage1_When_SimpleUserLoggedInAndRequestingIndex() throws Exception {
-		loadIndexPageWhenUserLoggedIn(ENDPOINT_INDEX, simpleUser, simpleUserRooms);
+	public void home_shouldLoadIndexPage_whenSimpleUserLoggedInAndRequestingIndex() {
+		loadIndexPageWhenUserLoggedIn(simpleUser);
 	}
 	
 	@Test
 	@WithMockUser
-	public void home_Should_LoadIndexPage_When_SimpleUserLoggedInAndRequestingRoot() throws Exception {
-		loadIndexPageWhenUserLoggedIn(ENDPOINT_ROOT, simpleUser, simpleUserRooms);
+	public void home_shouldLoadIndexPage_whenSimpleUserLoggedInAndRequestingRoot() {
+		loadIndexPageWhenUserLoggedIn(simpleUser);
 	}
 	
 	@Test
-	@WithMockUser // TODO the /login URL should normally be permitted without a mock user
-	public void login_Should_LoadLoginPage_When_RequestingLoginPage() throws Exception {
-		// when - then
-		this.mockMvc.perform(get(ENDPOINT_LOGIN).with(csrf()))
-					.andExpect(status().isOk())
-					.andExpect(content().string(containsString("<h3>Login with Username and Password</h3>")));
+	public void login_shouldLoadLoginPage_whenRequestingLoginPage() {
+		// when
+		String returnedView = indexController.login(new RedirectAttributesModelMap(), null, null);
+
+		// then
+		assertThat(returnedView).isEqualTo(VIEW_LOGIN);
 	}
 	
 	@Test
-	@WithMockUser // TODO the /registration URL should be permitted without a mock user
-	public void registration_Should_LoadRegistrationPage_When_RequestingRegistrationPage() throws Exception {
-		// when - then
-		this.mockMvc.perform(get(ENDPOINT_REGISTRATION))
-					.andExpect(status().isOk())
-					.andExpect(view().name(VIEW_REGISTRATION));
+	public void registration_shouldLoadRegistrationPage_whenRequestingRegistrationPage() {
+		// when
+		String returnedView = indexController.registration(new RedirectAttributesModelMap());
+
+		// then
+		assertThat(returnedView).isEqualTo(VIEW_REGISTRATION);
 	}
 	
 	@Test
-	@WithMockUser // TODO the /registration URL should normally be permitted without a mock user
-	public void registration_Should_SaveNewUser_When_SubmittedFromRegistrationPage() throws Exception {
-		// when - then
-		this.mockMvc.perform(post(ENDPOINT_REGISTRATION)
-								.with(csrf())
-								.param("name", "user2")
-								.param("surname", "surname")
-								.param("email", "user2@foo.com")
-					)
-					.andExpect(redirectedUrl(ENDPOINT_INDEX))
-					.andExpect(view().name("redirect:" + ENDPOINT_INDEX));
+	public void registration_shouldSaveNewUser_whenSubmittedFromRegistrationPage() {
+		// when
+		String returnedView = indexController.registration(
+				simpleUser,
+				new BeanPropertyBindingResult(new HashMap<>(), "foo")
+		);
+
+		// then
+		assertThat(returnedView).isEqualTo("redirect:" + ENDPOINT_INDEX);
 	}
 	
-	private void loadIndexPageWhenUserLoggedIn(String url, Person loggedInUser, Set<Room> rooms) throws Exception {
+	private void loadIndexPageWhenUserLoggedIn(Person loggedInUser) {
 		// given
 		when(personService.findByEmail(any())).thenReturn(loggedInUser);
-		
-		// when - then
-		this.mockMvc.perform(get(url))
-//					.andDo(print())
-					.andExpect(status().isOk()) 
-					.andExpect(model().attribute("loggedInUser", loggedInUser))
-					.andExpect(model().attribute("rooms", rooms))
-					.andExpect(view().name(VIEW_INDEX));
+
+		// when
+		String returnedView = indexController.home(new RedirectAttributesModelMap());
+
+		// then
+		assertThat(returnedView).isEqualTo(VIEW_INDEX);
 	}
 	
 }

@@ -1,4 +1,3 @@
-
 package eu.codingschool.homeautomation.controllers;
 
 import java.util.List;
@@ -78,7 +77,8 @@ public class PersonController {
 	public String editPerson(
 			@ModelAttribute("person") Person person,
 			@RequestParam(value = "selectedDeviceIds", required = false) List<String> selectedDeviceIds,
-			BindingResult result, Model model) {
+			BindingResult result,
+			Model model) {
 		
 		UserDetails loggedInUser = personService.getLoggedInUser();
 		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
@@ -116,7 +116,7 @@ public class PersonController {
 	 * Delete the person after accepting the deletion confirmation.
 	 */
 	@DeleteMapping(value = ENDPOINT_PERSONS_BASE_URL + "/{id}")
-	public String doDeletePerson(@PathVariable("id") int id, Model model) {
+	public String doDeletePerson(@PathVariable("id") int id) {
 		Person person = personService.findById(id);
 		if (person == null) {
 			return "redirect:" + VIEW_ERROR_404;

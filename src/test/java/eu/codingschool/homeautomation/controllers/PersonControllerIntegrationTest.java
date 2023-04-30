@@ -2,7 +2,6 @@ package eu.codingschool.homeautomation.controllers;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.isA;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,10 +10,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +75,7 @@ public class PersonControllerIntegrationTest {
 	@WithUserDetails(value = USER_ADMIN, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void getPeople_shouldReturnAllPeople_whenAdminUser() throws Exception {
 		mockMvc.perform(get(ENDPOINT_ADMIN_PERSONS_BASE_URL))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(VIEW_PERSON_LIST));
 	}
 
@@ -87,7 +83,7 @@ public class PersonControllerIntegrationTest {
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
 	public void getPeople_shouldBeForbidden_whenSimpleUser() throws Exception {
 		mockMvc.perform(get(ENDPOINT_ADMIN_PERSONS_BASE_URL))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -96,7 +92,7 @@ public class PersonControllerIntegrationTest {
 	public void viewEditPersonForm_shouldDisplayForm_whenAdminUser() throws Exception {
 		Integer personId = 103;
 		mockMvc.perform(put(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL + "/form", personId))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(MODAL_PERSON_NEW_OR_EDIT))
 			   .andExpect(model().size(6))
 			   .andExpect(model().attribute("person", isA(Person.class)))
@@ -116,7 +112,7 @@ public class PersonControllerIntegrationTest {
 	public void viewEditPersonForm_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer personId = 103;
 		mockMvc.perform(put(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -132,7 +128,7 @@ public class PersonControllerIntegrationTest {
 							.param("surname", "UserSurname")
 							.param("email", "testuser2@foo.com")
 				)
-				.andDo(print())
+				.andExpect(status().is3xxRedirection())
 				.andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL));
 
 		// Check that the person was edited
@@ -151,7 +147,7 @@ public class PersonControllerIntegrationTest {
 							.param("surname", "UserSurname")
 							.param("email", "testuser2")
 				)
-				.andDo(print())
+				.andExpect(status().isOk())
 				.andExpect(view().name(MODAL_PERSON_NEW_OR_EDIT));
 	}
 
@@ -160,7 +156,7 @@ public class PersonControllerIntegrationTest {
 	public void editPerson_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer personId = 103;
 		mockMvc.perform(put(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -169,7 +165,7 @@ public class PersonControllerIntegrationTest {
 	public void confirmDeletePerson_shouldDisplayConfirmationDialog_whenAdminUser() throws Exception {
 		Integer personId = 103;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL + "/confirmation", personId))
-			   .andDo(print())
+			   .andExpect(status().isOk())
 			   .andExpect(view().name(MODAL_PERSON_DELETE))
 			   .andExpect(model().size(3))
 			   .andExpect(model().attribute("person", hasProperty("id", equalTo(personId))))
@@ -185,7 +181,7 @@ public class PersonControllerIntegrationTest {
 	public void confirmDeletePerson_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer personId = 103;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 
@@ -196,7 +192,7 @@ public class PersonControllerIntegrationTest {
 		long peopleCountBefore = personRepository.count();
 		Integer personId = savedPerson.getId();
 		mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId))
-			   .andDo(print())
+			   .andExpect(status().is3xxRedirection())
 			   .andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL));
 
 		// Check that the new person was deleted
@@ -211,7 +207,7 @@ public class PersonControllerIntegrationTest {
 		Integer personId = 103;
 		long peopleCountBefore = personRepository.count();
 		mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId))
-		   	   .andDo(print())
+		   	   .andExpect(status().is3xxRedirection())
 		   	   .andExpect(view().name(REDIRECT_ENDPOINT_ADMIN_PERSONS_BASE_URL));
 		
 		// Check that the existing person was deleted
@@ -225,7 +221,7 @@ public class PersonControllerIntegrationTest {
 	public void doDeletePerson_shouldBeForbidden_whenSimpleUser() throws Exception {
 		Integer personId = 103;
 		mockMvc.perform(delete(ENDPOINT_ADMIN_PERSONS_EDIT_OR_DELETE_BASE_URL, personId))
-			   .andDo(print())
+			   .andExpect(status().isForbidden())
 			   .andExpect(forwardedUrl(VIEW_ERROR_403));
 	}
 

@@ -82,7 +82,7 @@ public class DeviceController {
 	 * Save a new device by submitting the form.
 	 */
 	@PostMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL)
-	public String addDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
+	public String addDevice(@ModelAttribute("device") Device device, BindingResult result) {
 		return saveOrUpdateDevice(device, result);
 	}
 	
@@ -107,7 +107,7 @@ public class DeviceController {
 	 * Update a device by submitting the form.
 	 */
 	@PutMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}")
-	public String editDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
+	public String editDevice(@ModelAttribute("device") Device device, BindingResult result) {
 		return saveOrUpdateDevice(device, result);
 	}
 	
@@ -127,7 +127,7 @@ public class DeviceController {
 	 * Delete the device after accepting the deletion confirmation.
 	 */
 	@DeleteMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}")
-	public String doDeleteDevice(@ModelAttribute("device") Device device, BindingResult result, ModelMap model) {
+	public String doDeleteDevice(@ModelAttribute("device") Device device, ModelMap model) {
 		try {
 			device = deviceService.findById(device.getId());
 			deviceService.delete(device);
