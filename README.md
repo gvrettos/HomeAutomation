@@ -61,3 +61,10 @@ Admin can control any device in any manner:
 4. Access application through browser:
 
 	http://localhost:8080/homeAutomation/
+
+# Troubleshooting
+If you experience issues such as `java.lang.ClassNotFoundException: javax.servlet.Filter` during the startup of the
+application then it may be caused to configuration of your IDE. 
+
+For instance, check [this StackOverflow post](https://stackoverflow.com/a/71499813) on how to overcome this issue on
+IntelliJ IDEA.
