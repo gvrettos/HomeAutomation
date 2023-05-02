@@ -1,6 +1,5 @@
 package eu.codingschool.homeautomation.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -17,15 +16,6 @@ import eu.codingschool.homeautomation.validators.PersonValidator;
 @Controller
 public class IndexController {
 
-	@Autowired
-	private PersonValidator personValidator;
-
-	@Autowired
-	private PersonService personService;
-	
-	@Autowired
-	private RoomService roomService;
-
 	private static final String ENDPOINT_ROOT = "/";
 	private static final String VIEW_INDEX = "index";
 	private static final String ENDPOINT_INDEX = ENDPOINT_ROOT + VIEW_INDEX;
@@ -33,6 +23,18 @@ public class IndexController {
 	private static final String ENDPOINT_LOGIN = ENDPOINT_ROOT + VIEW_LOGIN;
 	private static final String VIEW_REGISTRATION = "registration";
 	private static final String ENDPOINT_REGISTRATION = ENDPOINT_ROOT + VIEW_REGISTRATION;
+
+	private final PersonService personService;
+
+	private final RoomService roomService;
+
+	private final PersonValidator personValidator;
+
+	public IndexController(PersonService personService, RoomService roomService, PersonValidator personValidator) {
+		this.personService = personService;
+		this.roomService = roomService;
+		this.personValidator = personValidator;
+	}
 
 	@GetMapping(value = { ENDPOINT_ROOT, ENDPOINT_INDEX })
 	public String home(ModelMap model) {

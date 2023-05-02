@@ -3,7 +3,6 @@ package eu.codingschool.homeautomation.controllers;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -40,20 +39,30 @@ public class DeviceController {
 	private static final String VIEW_DEVICE_LIST = "device/list";
 	public static final String VIEW_DEVICE_GRID = "device/grid";
 
-	@Autowired
-	private PersonService personService;
-	
-	@Autowired
-	private DeviceService deviceService;
-	
-	@Autowired
-	private DeviceTypeService deviceTypeService;
-	
-	@Autowired
-	private RoomService roomService;
-	
-	@Autowired
-	private DeviceValidator deviceValidator;
+
+	private final PersonService personService;
+
+	private final DeviceService deviceService;
+
+	private final DeviceTypeService deviceTypeService;
+
+	private final RoomService roomService;
+
+	private final DeviceValidator deviceValidator;
+
+	public DeviceController(
+			PersonService personService,
+			DeviceService deviceService,
+			DeviceTypeService deviceTypeService,
+			RoomService roomService,
+			DeviceValidator deviceValidator) {
+
+		this.personService = personService;
+		this.deviceService = deviceService;
+		this.deviceTypeService = deviceTypeService;
+		this.roomService = roomService;
+		this.deviceValidator = deviceValidator;
+	}
 	
 	
 	@GetMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL)

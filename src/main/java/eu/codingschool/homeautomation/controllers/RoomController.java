@@ -1,6 +1,5 @@
 package eu.codingschool.homeautomation.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,14 +27,17 @@ public class RoomController {
 
 	private static final String VIEW_ROOM_LIST = "room/list";
 
-	@Autowired
-	private RoomService roomService;
-	
-	@Autowired
-	private PersonService personService;
+	private final RoomService roomService;
 
-	@Autowired
-	private RoomValidator roomValidator;
+	private final PersonService personService;
+
+	private final RoomValidator roomValidator;
+
+    public RoomController(RoomService roomService, PersonService personService, RoomValidator roomValidator) {
+        this.roomService = roomService;
+        this.personService = personService;
+        this.roomValidator = roomValidator;
+    }
 
 	@GetMapping(value = ENDPOINT_ROOMS_BASE_URL)
 	public String getRooms(Model model) {

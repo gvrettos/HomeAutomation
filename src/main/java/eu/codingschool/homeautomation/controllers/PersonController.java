@@ -2,7 +2,6 @@ package eu.codingschool.homeautomation.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -30,17 +29,25 @@ public class PersonController {
 	private static final String VIEW_PERSON_LIST = "person/list";
 	private static final String VIEW_ERROR_404 = "/error/404";
 
-	@Autowired
-	public PersonService personService;
-	
-	@Autowired
-	public DeviceService deviceService;
-	
-	@Autowired
-	public RoomService roomService;
-	
-	@Autowired
-	public PersonValidator personValidator;
+	private final PersonService personService;
+
+	private final DeviceService deviceService;
+
+	private final RoomService roomService;
+
+	private final PersonValidator personValidator;
+
+	public PersonController(
+			PersonService personService,
+			DeviceService deviceService,
+			RoomService roomService,
+			PersonValidator personValidator) {
+
+		this.personService = personService;
+		this.deviceService = deviceService;
+		this.roomService = roomService;
+		this.personValidator = personValidator;
+	}
 
 	@GetMapping(value = ENDPOINT_PERSONS_BASE_URL)
 	public String getPeople(Model model) {
