@@ -1,6 +1,5 @@
 package eu.codingschool.homeautomation.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,14 +33,21 @@ public class DeviceTypeController {
 
 	private static final String VIEW_DEVICE_TYPE_LIST = "deviceType/list";
 
-	@Autowired
-	private DeviceTypeService deviceTypeService;
-	
-	@Autowired
-	private PersonService personService;
-	
-	@Autowired
-	private DeviceTypeValidator deviceTypeValidator;
+	private final DeviceTypeService deviceTypeService;
+
+	private final PersonService personService;
+
+	private final DeviceTypeValidator deviceTypeValidator;
+
+	public DeviceTypeController(
+			DeviceTypeService deviceTypeService,
+			PersonService personService,
+			DeviceTypeValidator deviceTypeValidator) {
+
+		this.deviceTypeService = deviceTypeService;
+		this.personService = personService;
+		this.deviceTypeValidator = deviceTypeValidator;
+	}
 
 
 	@GetMapping(value = ENDPOINT_DEVICE_TYPES_BASE_URL)

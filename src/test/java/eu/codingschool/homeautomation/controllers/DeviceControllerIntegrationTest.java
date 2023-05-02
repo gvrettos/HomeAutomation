@@ -38,7 +38,7 @@ import eu.codingschool.homeautomation.repositories.DeviceRepository;
 		webEnvironment = SpringBootTest.WebEnvironment.MOCK, 
 		classes = HomeAutomationApplication.class
 )
-//We can @Autowire MockMvc if Spring security was absent and we didn't configure that via setUp().
+// We could have @Autowired MockMvc if Spring security was absent and we didn't configure that via setUp().
 //@AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
 @SqlGroup({
