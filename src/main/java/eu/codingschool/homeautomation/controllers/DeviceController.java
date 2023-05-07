@@ -1,6 +1,7 @@
 package eu.codingschool.homeautomation.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -76,6 +77,8 @@ public class DeviceController {
 	 */
 	@PostMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/form")
 	public String newDevice(Model model) {
+		checkAdminUser();
+
 		model.addAttribute("device", new Device());
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
 		Set<Room> allRooms = roomService.findAll();
@@ -100,6 +103,8 @@ public class DeviceController {
 	 */
 	@PutMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}/form")
 	public String viewDevice(@PathVariable(value="id") int id, Model model) {
+		checkAdminUser();
+
 		Device device = deviceService.findById(id);
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
 		Set<Room> allRooms = roomService.findAll();
@@ -125,6 +130,8 @@ public class DeviceController {
 	 */
 	@DeleteMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}/confirmation")
 	public String confirmDeleteDevice(@PathVariable(value="id") int id, Model model) {
+		checkAdminUser();
+
 		Device device = deviceService.findById(id);
 		model.addAttribute("device", device);
 		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICES_BASE_URL + "/" + id);
@@ -137,6 +144,8 @@ public class DeviceController {
 	 */
 	@DeleteMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/{id}")
 	public String doDeleteDevice(@ModelAttribute("device") Device device, ModelMap model) {
+		checkAdminUser();
+
 		try {
 			device = deviceService.findById(device.getId());
 			deviceService.delete(device);
@@ -151,6 +160,8 @@ public class DeviceController {
 	}
 	
 	private String saveOrUpdateDevice(Device device, BindingResult result) {
+		checkAdminUser();
+
 		deviceValidator.validate(device, result);
 		
 		if (result.hasErrors()) {
@@ -161,18 +172,18 @@ public class DeviceController {
 		deviceService.save(device);
 		return REDIRECT_ENDPOINT_ADMIN_DEVICES_BASE_URL;
 	}
-	
+
 	private void getAllDevices(Model model) {
-		UserDetails loggedInUser = personService.getLoggedInUser();
-		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
-			throw new AccessDeniedException("");
-		}
-		
+		checkAdminUser();
+
 		model.addAttribute("devices", deviceService.findAll());
 		model.addAttribute("rooms", roomService.findAll());
-		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+		model.addAttribute(
+				"loggedInUser",
+				personService.findByEmail(personService.getLoggedInUser().getUsername())
+		);
 	}
-	
+
 	/**
 	 * Display the devices that can be operated by an ADMIN only
 	 */
@@ -187,17 +198,8 @@ public class DeviceController {
 	 */
 	@GetMapping(value = ENDPOINT_DEVICES_BASE_URL + "/user/{id}")
 	public String showUserDevices(@PathVariable(value="id") int userId, Model model) {
-		
-		UserDetails loggedInUserDetails = personService.getLoggedInUser();
-		Person requestedUser = personService.findById(userId);
-		if ( loggedInUserDetails == null 
-				|| requestedUser == null 
-				|| loggedInUserDetails.getUsername() == null 
-				|| !loggedInUserDetails.getUsername().equals(requestedUser.getEmail()) ) {
-			throw new AccessDeniedException("");
-		}
-    	
-    	populateSideMenu(model, loggedInUserDetails);
+		UserDetails loggedInUserDetails = getUserAuthorized(userId);
+		populateSideMenu(model, loggedInUserDetails);
     	model.addAttribute("devices", deviceService.findByPersonsId(userId));
 		return VIEW_DEVICE_GRID;
 	}
@@ -207,16 +209,15 @@ public class DeviceController {
 	 */
 	@GetMapping(value = ENDPOINT_ADMIN_DEVICES_BASE_URL + "/user/all/room/{roomId}")
 	public String showAdminDevicesPerRoom(@PathVariable(value="roomId") int roomId, Model model) {
-		
-		UserDetails loggedInUser = personService.getLoggedInUser();
-		if ( loggedInUser == null || loggedInUser.getUsername() == null ) {
-			throw new AccessDeniedException("");
-		}
+		checkAdminUser();
 		
 		model.addAttribute("devices", deviceService.findAllByRoomId(roomId));
 		model.addAttribute("rooms", roomService.findAll());
 		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
-		model.addAttribute("loggedInUser", personService.findByEmail(loggedInUser.getUsername()));
+		model.addAttribute(
+				"loggedInUser",
+				personService.findByEmail(personService.getLoggedInUser().getUsername())
+		);
 		return VIEW_DEVICE_GRID;
 	}
 	
@@ -228,32 +229,25 @@ public class DeviceController {
 			@PathVariable(value="userId") int userId, 
 			@PathVariable(value="roomId") int roomId, 
 			Model model) {
-		
-		UserDetails loggedInUserDetails = personService.getLoggedInUser();
-		Person requestedUser = personService.findById(userId);
-		if ( loggedInUserDetails == null 
-				|| requestedUser == null 
-				|| loggedInUserDetails.getUsername() == null 
-				|| !loggedInUserDetails.getUsername().equals(requestedUser.getEmail()) ) {
-			throw new AccessDeniedException("");
-		}
-		
+
+		UserDetails loggedInUserDetails = getUserAuthorized(userId);
 		populateSideMenu(model, loggedInUserDetails);
 		model.addAttribute("devices", deviceService.findByPersonsIdAndRoomId(userId, roomId));
 		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
 		return VIEW_DEVICE_GRID;
 	}
-	
+
 	/**
 	 * Set the device on/off.
 	 */
-	// FIXME A simple user can update a device which is assigned to another user and not them!
 	@PatchMapping(value = ENDPOINT_DEVICES_BASE_URL + "/{id}/updateStatus/{status}")
 	public String updateDeviceStatus(
 			@PathVariable(value="id") int deviceId, 
 			@PathVariable(value="status") boolean status,
 			HttpServletRequest request) {
-		
+
+		checkDeviceAssignedToLoggedInUserOrAdmin(deviceId);
+
 		Device device = deviceService.findById(deviceId);
 		device.setStatusOn(status);
 		deviceService.save(device);
@@ -264,18 +258,62 @@ public class DeviceController {
 	/**
 	 * Increase/Decrease the device's information value. 
 	 */
-	// FIXME A simple user can update a device which is assigned to another user and not them!
 	@PatchMapping(value = ENDPOINT_DEVICES_BASE_URL + "/{id}/updateValue/{value}")
 	public String updateDeviceInformationValue(
 			@PathVariable(value="id") int deviceId, 
 			@PathVariable(value="value") String informationValue,
 			HttpServletRequest request) {
-		
+
+		checkDeviceAssignedToLoggedInUserOrAdmin(deviceId);
+
 		Device device = deviceService.findById(deviceId);
 		device.setInformationValue(informationValue);
 		deviceService.save(device);
 		
 		return redirectPage(request);
+	}
+
+	private void checkAdminUser() {
+		UserDetails loggedInUserDetails = personService.getLoggedInUser();
+		if (loggedInUserDetails == null
+				|| loggedInUserDetails.getUsername() == null
+				|| !personService.findByEmail(loggedInUserDetails.getUsername()).isAdmin()) {
+
+			throw new AccessDeniedException("");
+		}
+	}
+
+	private UserDetails getUserAuthorized(int userId) {
+		UserDetails loggedInUserDetails = personService.getLoggedInUser();
+		Person requestedUser = personService.findById(userId);
+		if ( loggedInUserDetails == null
+				|| requestedUser == null
+				|| loggedInUserDetails.getUsername() == null
+				|| !loggedInUserDetails.getUsername().equals(requestedUser.getEmail()) ) {
+			throw new AccessDeniedException("");
+		}
+		return loggedInUserDetails;
+	}
+
+	private void checkDeviceAssignedToLoggedInUserOrAdmin(int deviceId) {
+		UserDetails loggedInUserDetails = personService.getLoggedInUser();
+		if (loggedInUserDetails == null || loggedInUserDetails.getUsername() == null) {
+			throw new AccessDeniedException("");
+		}
+
+		if (personService.findByEmail(loggedInUserDetails.getUsername()).isAdmin()) {
+			return;
+		}
+
+		Set<Device> userDevices = personService.findByEmail(loggedInUserDetails.getUsername()).getDevices();
+		Optional<Integer> deviceIdFound = userDevices.stream()
+													 .map(device -> device.getId())
+													 .filter(deviceIdStream -> deviceIdStream == deviceId)
+													 .findFirst();
+		if (!deviceIdFound.isPresent()) {
+			// trying to access a device that does not belong to the logged in user
+			throw new AccessDeniedException("");
+		}
 	}
 	
 	private void populateSideMenu(Model model, UserDetails loggedInUserDetails) {
