@@ -68,3 +68,21 @@ application then it may be caused to configuration of your IDE.
 
 For instance, check [this StackOverflow post](https://stackoverflow.com/a/71499813) on how to overcome this issue on
 IntelliJ IDEA.
+
+# Useful links / references
+## ER diagrams
+* https://creately.com/blog/diagrams/class-diagram-relationships/
+* https://www.youtube.com/watch?v=K6w0bZjl_Lw (MySQL Workbench ER tutorial)
+
+## UI elements
+* https://bootsnipp.com/snippets/featured/address-details-modal-form
+* https://bootsnipp.com/snippets/featured/striped-table-30
+* https://bootsnipp.com/snippets/featured/buttons-minus-and-plus-in-input
+
+## Thymeleaf references
+* https://ultraq.github.io/thymeleaf-layout-dialect/
+* https://www.thymeleaf.org/doc/articles/layouts.html
+
+## Code references
+* http://www.mkyong.com/spring-mvc/spring-mvc-form-handling-example/
+* http://www.mkyong.com/spring-boot/spring-boot-spring-security-thymeleaf-example/
