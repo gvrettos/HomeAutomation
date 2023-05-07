@@ -440,15 +440,10 @@ public class DeviceControllerIntegrationTest {
 		boolean deviceStatusAfter = deviceRepository.findById(deviceId).get().isStatusOn();
 		assertEquals(!deviceStatusBefore, deviceStatusAfter);
 	}
-	
-	// A simple user can update a device which is assigned to another user and not them!
-	// It denotes a problem in the security of the implementation!!!
+
 	@Test
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
-	public void updateDeviceStatus_shouldUpdateStatusAndRedirectToUserDevices_whenSimpleUserUpdatesDeviceForOtherUser() 
-			throws Exception {
-		
-		Integer userId = 102; // testuser1@foo.com
+	public void updateDeviceStatus_shouldFail_whenSimpleUserUpdatesUnauthorizedDevice() throws Exception {
 		Integer deviceId = 6; // deviceId should be controlled only by ADMIN and testuser2@foo.com!
 		boolean deviceStatusBefore = deviceRepository.findById(deviceId).get().isStatusOn();
 		
@@ -457,11 +452,11 @@ public class DeviceControllerIntegrationTest {
 								String.valueOf(!deviceStatusBefore)
 							)
 			   )
-			   .andExpect(status().is3xxRedirection())
-			   .andExpect(view().name(REDIRECT + ENDPOINT_DEVICE_PER_USER.replace("{id}", String.valueOf(userId))));
-		
+			   .andExpect(status().isForbidden());
+
 		boolean deviceStatusAfter = deviceRepository.findById(deviceId).get().isStatusOn();
-		assertEquals(!deviceStatusBefore, deviceStatusAfter);
+		// status for the device should not be updated
+		assertEquals(deviceStatusBefore, deviceStatusAfter);
 	}
 	
 	@Test
@@ -512,15 +507,10 @@ public class DeviceControllerIntegrationTest {
 		);
 		assertEquals(deviceInformationValueBefore + 1L, deviceInformationValueAfter);
 	}
-	
-	// A simple user can update a device which is assigned to another user and not them!
-	// It denotes a problem in the security of the implementation!!!
+
 	@Test
 	@WithUserDetails(value = USER_SIMPLE, userDetailsServiceBeanName = USER_DETAILS_SERVICE)
-	public void updateDeviceInformationValue_shouldUpdateInformationValue_whenSimpleUserUpdatesDeviceForOtherUser() 
-			 throws Exception {
-		
-		Integer userId = 102; // testuser1@foo.com
+	public void updateDeviceInformationValue_shouldFail_whenSimpleUserUpdatesUnauthorizedDevice() throws Exception {
 		Integer deviceId = 6; // deviceId should be controlled only by ADMIN and testuser2@foo.com!
 		int deviceInformationValueBefore = Integer.parseInt(
 				deviceRepository.findById(deviceId).get().getInformationValue()
@@ -531,13 +521,13 @@ public class DeviceControllerIntegrationTest {
 								String.valueOf(deviceInformationValueBefore + 1)
 							)
 			   )
-			   .andExpect(status().is3xxRedirection())
-			   .andExpect(view().name(REDIRECT + ENDPOINT_DEVICE_PER_USER.replace("{id}", String.valueOf(userId))));
+			   .andExpect(status().isForbidden());
 		
 		int deviceInformationValueAfter = Integer.parseInt(
 				deviceRepository.findById(deviceId).get().getInformationValue()
 		);
-		assertEquals(deviceInformationValueBefore + 1L, deviceInformationValueAfter);
+		// information value for the device should not be updated
+		assertEquals(deviceInformationValueBefore, deviceInformationValueAfter);
 	}
 	
 }

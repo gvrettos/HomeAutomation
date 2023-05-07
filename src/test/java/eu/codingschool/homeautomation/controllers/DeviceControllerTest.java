@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -127,7 +128,10 @@ public class DeviceControllerTest {
 	@WithMockUser
 	public void getAdminDevicesList_shouldLoadAllDevices_whenAdminLoggedInAndRequestingDevices() {
 		// given
-		when(personService.getLoggedInUser()).thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.getAdminDevicesList(new RedirectAttributesModelMap());
@@ -139,6 +143,12 @@ public class DeviceControllerTest {
 	@Test
 	@WithMockUser
 	public void newDevice_shouldOpenModal_whenRequested() {
+		// given
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
+
 		// when
 		String returnedView = deviceController.newDevice(new RedirectAttributesModelMap());
 
@@ -149,6 +159,12 @@ public class DeviceControllerTest {
 	@Test
 	@WithMockUser
 	public void addDevice_shouldSaveDevice_whenProvided() {
+		// given
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
+
 		// when
 		String returnedView = deviceController.addDevice(
 				new Device(),
@@ -164,6 +180,11 @@ public class DeviceControllerTest {
 	@WithMockUser
 	public void addDevice_shouldNotSaveDeviceType_whenNameNotProvided() {
 		// given
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
+
 		// mock the void method to return validation errors
 		doAnswer(validator -> {
 			((BeanPropertyBindingResult)validator.getArguments()[1]).addError(new ObjectError("name", "NotEmpty"));
@@ -186,6 +207,10 @@ public class DeviceControllerTest {
 	public void viewDevice_shouldOpenModal_whenRequested() {
 		// given
 		int deviceId = 2;
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.viewDevice(2, new RedirectAttributesModelMap());
@@ -202,6 +227,10 @@ public class DeviceControllerTest {
 	public void editDevice_shouldSaveDevice_whenProvided() {
 		// given
 		Integer deviceId = 2;
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.editDevice(
@@ -219,6 +248,10 @@ public class DeviceControllerTest {
 	public void editDevice_shouldNotSaveDevice_whenNameNotProvided() {
 		// given
 		int deviceId = 2;
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// mock the void method to return validation errors
 		doAnswer(validator -> {
@@ -242,6 +275,10 @@ public class DeviceControllerTest {
 	public void confirmDeleteDevice_shouldOpenModal_whenRequested() {
 		// given
 		int deviceId = 2;
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.confirmDeleteDevice(deviceId, new RedirectAttributesModelMap());
@@ -258,6 +295,10 @@ public class DeviceControllerTest {
 	public void doDeleteDevice_shouldCallDelete_whenExists() {
 		// given
 		Integer deviceId = 2;
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.doDeleteDevice(
@@ -278,6 +319,11 @@ public class DeviceControllerTest {
 		Device device = new Device();
 		device.setId(deviceId);
 
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
+
 		// when
 		String returnedView = deviceController.doDeleteDevice(device, new RedirectAttributesModelMap());
 
@@ -290,7 +336,10 @@ public class DeviceControllerTest {
 	@WithMockUser
 	public void showAdminDevices_shouldLoadAllDevices_whenAdminLoggedInAndRequestingDevices() {
 		// given
-		when(personService.getLoggedInUser()).thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.showAdminDevices(new RedirectAttributesModelMap());
@@ -304,7 +353,10 @@ public class DeviceControllerTest {
 	public void showUserDevices_shouldLoadUserDevicesOnly_whenSimpleLoggedInAndRequestingDevices() {
 		// given
 		int userId = 2;
-		when(personService.getLoggedInUser()).thenReturn(new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList()));
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(SIMPLE_USER_EMAIL)).thenReturn(simpleUser);
 
 		// when
 		String returnedView = deviceController.showUserDevices(userId, new RedirectAttributesModelMap());
@@ -318,7 +370,10 @@ public class DeviceControllerTest {
 	public void showAdminDevicesPerRoom_shouldLoadAllRoomDevices_whenAdminLoggedInAndRequestingRoomDevices() {
 		// given
 		int roomId = 1;
-		when(personService.getLoggedInUser()).thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(ADMIN_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(ADMIN_USER_EMAIL)).thenReturn(admin);
 
 		// when
 		String returnedView = deviceController.showAdminDevicesPerRoom(roomId, new RedirectAttributesModelMap());
@@ -333,7 +388,10 @@ public class DeviceControllerTest {
 		// given
 		int userId = 2;
 		int roomId = 1;
-		when(personService.getLoggedInUser()).thenReturn(new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList()));
+		when(personService.getLoggedInUser())
+				.thenReturn(new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList()));
+
+		when(personService.findByEmail(SIMPLE_USER_EMAIL)).thenReturn(simpleUser);
 
 		// when
 		String returnedView = deviceController.showUserDevicesPerRoom(userId, roomId, new RedirectAttributesModelMap());
@@ -375,6 +433,20 @@ public class DeviceControllerTest {
 		);
 	}
 
+	@Test(expected = AccessDeniedException.class) // then
+	@WithMockUser
+	public void updateDeviceStatus_shouldFail_whenSimpleUserLoggedInAndSettingStatusToOnForUnauthorizedDevice() {
+		// given
+		int deviceId = 1;
+		String value = String.valueOf(new Random().nextInt(101));
+		User userDetails = new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList());
+		when(personService.getLoggedInUser()).thenReturn(userDetails);
+		when(personService.findByEmail(any())).thenReturn(simpleUser);
+
+		// when
+		deviceController.updateDeviceStatus(deviceId, true, mock(HttpServletRequest.class));
+	}
+
 	@Test
 	@WithMockUser
 	public void updateDeviceStatus_shouldRedirectToUserDevices_whenSimpleUserLoggedInAndSettingStatusToOff() {
@@ -384,6 +456,20 @@ public class DeviceControllerTest {
 				false,
 				ENDPOINT_DEVICES_BASE_URL + "/user/" + simpleUser.getId()
 		);
+	}
+
+	@Test(expected = AccessDeniedException.class) // then
+	@WithMockUser
+	public void updateDeviceStatus_shouldFail_whenSimpleUserLoggedInAndSettingStatusToOffForUnauthorizedDevice() {
+		// given
+		int deviceId = 1;
+		String value = String.valueOf(new Random().nextInt(101));
+		User userDetails = new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList());
+		when(personService.getLoggedInUser()).thenReturn(userDetails);
+		when(personService.findByEmail(any())).thenReturn(simpleUser);
+
+		// when
+		deviceController.updateDeviceStatus(deviceId, false, mock(HttpServletRequest.class));
 	}
 
 	@Test
@@ -406,13 +492,33 @@ public class DeviceControllerTest {
 		);
 	}
 
+	@Test(expected = AccessDeniedException.class) // then
+	@WithMockUser
+	public void updateDeviceInformationValue_shouldFail_whenSimpleUserLoggedInAndChangingValueForUnauthorizedDevice() {
+		// given
+		int deviceId = 1;
+		String value = String.valueOf(new Random().nextInt(101));
+		User userDetails = new User(SIMPLE_USER_EMAIL, "pass-foo", Collections.emptyList());
+		when(personService.getLoggedInUser()).thenReturn(userDetails);
+		when(personService.findByEmail(any())).thenReturn(simpleUser);
+
+		// when
+		deviceController.updateDeviceInformationValue(deviceId, value, mock(HttpServletRequest.class));
+	}
+
 	private void updateDeviceStatus_shouldRedirectToDevices_whenAnyUserLoggedInAndSettingStatusToAnything(
 			User userDetails, Person user, boolean status, String expectedUrl) {
 
 		// given
 		int deviceId = 1;
+		Device device = new Device();
+		device.setId(deviceId);
 		when(personService.getLoggedInUser()).thenReturn(userDetails);
-		when(personService.findByEmail(any())).thenReturn(user);
+		when(personService.findByEmail(user.getEmail())).thenReturn(user);
+		if (!user.isAdmin()) {
+			// we assume that device belongs to the user if they are not ADMIN
+			user.setDevices(new HashSet<>(Arrays.asList(allDevices.get(deviceId - 1))));
+		}
 
 		// when
 		String returnedView = deviceController.updateDeviceStatus(deviceId, status, mock(HttpServletRequest.class));
@@ -429,6 +535,10 @@ public class DeviceControllerTest {
 		String value = String.valueOf(new Random().nextInt(101));
 		when(personService.getLoggedInUser()).thenReturn(userDetails);
 		when(personService.findByEmail(any())).thenReturn(user);
+		if (!user.isAdmin()) {
+			// we assume that device belongs to the user if they are not ADMIN
+			user.setDevices(new HashSet<>(Arrays.asList(allDevices.get(deviceId - 1))));
+		}
 
 		// when
 		String returnedView = deviceController.updateDeviceInformationValue(deviceId, value, mock(HttpServletRequest.class));
