@@ -125,6 +125,7 @@ public class DeviceTypeController {
 			deviceType = deviceTypeService.findById(deviceType.getId());
 			deviceTypeService.delete(deviceType);
 		} catch (DataIntegrityViolationException ex) {
+			// FIXME this will return statusCode = 200 OK which is not correct
 			model.addAttribute("action", "delete device type");
 			model.addAttribute("entityName", deviceType.getType());
 			model.addAttribute("additionalMessage", "Please check if the device type is used by any device. Only unused device types can be deleted.");

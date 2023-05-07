@@ -141,6 +141,7 @@ public class DeviceController {
 			device = deviceService.findById(device.getId());
 			deviceService.delete(device);
 		} catch (DataIntegrityViolationException ex) {
+			// FIXME this will return statusCode = 200 OK which is not correct
 			model.addAttribute("action", "delete device");
 			model.addAttribute("entityName", device.getName());
 			model.addAttribute("additionalMessage", "Please check if the device has been assigned to any user. Only unassigned devices can be deleted.");
@@ -287,8 +288,8 @@ public class DeviceController {
 		model.addAttribute("loggedInUser", loggedInUser);
 	}
 
-	// FIXME the actual redirection URLs may be different
-	// FIXME E.g. after ADMIN updates the status of a device in a specific room we do not want to return them back to all devices
+	// FIXME the actual redirection URLs may be different, so we need to handle them
+	// E.g. after ADMIN updates the status of a device in a specific room we do not want to return them back to all devices
 	private String redirectPage(HttpServletRequest request) {
 		UserDetails loggedInUser = personService.getLoggedInUser();
 		if (loggedInUser != null && loggedInUser.getUsername() != null) {
