@@ -105,10 +105,10 @@ public class DeviceControllerTest {
 		livingRoom.setDevices(new HashSet<>(Arrays.asList(device1, device2)));
 		
 		allDevices = Arrays.asList(device1, device2, device3);
-		Set<Room> allRooms = new HashSet<>(Arrays.asList(livingRoom, kitchen, bedroom));
+		List<Room> allRooms = Arrays.asList(livingRoom, kitchen, bedroom);
 
 		List<Device> simpleUserAllDevices = Arrays.asList(device2, device3);
-		Set<Room> simpleUserRooms = new HashSet<>(Arrays.asList(device2.getRoom()));
+		List<Room> simpleUserRooms = Arrays.asList(device2.getRoom());
 		
 		when(deviceService.findAll()).thenReturn(allDevices);
 		when(deviceService.findByPersonsId(2)).thenReturn(simpleUserAllDevices);

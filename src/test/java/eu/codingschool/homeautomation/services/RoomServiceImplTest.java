@@ -7,10 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,8 +51,8 @@ public class RoomServiceImplTest {
 	private Room room1;
 	private Room room2;
 	
-	private Set<Room> person1Rooms;
-	private Set<Room> person2Rooms;
+	private List<Room> person1Rooms;
+	private List<Room> person2Rooms;
 
 	@Before
 	public void setUp() {
@@ -69,8 +67,8 @@ public class RoomServiceImplTest {
 		person2 = new Person();
 		person2.setId(2);
 		
-		person1Rooms = new HashSet<>(Arrays.asList(room1, room2));
-		person2Rooms = new HashSet<>();
+		person1Rooms = Arrays.asList(room1, room2);
+		person2Rooms = Arrays.asList();
 		
 		Mockito.when(roomRepository.findById(room1.getId())).thenReturn(Optional.of(room1));
 		Mockito.when(roomRepository.findById(room2.getId())).thenReturn(Optional.of(room2));
@@ -83,7 +81,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findAll()).thenReturn(roomsSaved);
 		
 		// when
-		Set<Room> roomsFound = roomService.findAll();
+		List<Room> roomsFound = roomService.findAll();
 		
 		// then
 		assertNotNull(roomsFound);
@@ -96,7 +94,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findAll()).thenReturn(Arrays.asList());
 		
 		// when
-		Set<Room> rooms = roomService.findAll();
+		List<Room> rooms = roomService.findAll();
 		
 		// then
 		assertNotNull(rooms);
@@ -128,7 +126,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findUserRooms(person1.getId())).thenReturn(person1Rooms);
 		
 		// when
-		Set<Room> rooms = roomService.findByUser(person1.getId());
+		List<Room> rooms = roomService.findByUser(person1.getId());
 		
 		// then
 		assertNotNull(rooms);
@@ -141,7 +139,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findUserRooms(person2.getId())).thenReturn(person2Rooms);
 		
 		// when
-		Set<Room> room = roomService.findByUser(person2.getId());
+		List<Room> room = roomService.findByUser(person2.getId());
 		
 		// then
 		assertThat(room).isEmpty();

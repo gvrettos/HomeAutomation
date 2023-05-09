@@ -1,7 +1,6 @@
 package eu.codingschool.homeautomation.services;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,8 @@ public class RoomServiceImpl implements RoomService {
 	RoomRepository roomRepository;
 
 	@Override
-	public Set<Room> findAll() {
-		return new HashSet<>(roomRepository.findAll());
+	public List<Room> findAll() {
+		return roomRepository.findAll();
 	}
 	
 	@Override
@@ -26,7 +25,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 	
 	@Override
-	public Set<Room> findByUser(Integer personId) {
+	public List<Room> findByUser(Integer personId) {
 		return roomRepository.findUserRooms(personId);
 	}
 

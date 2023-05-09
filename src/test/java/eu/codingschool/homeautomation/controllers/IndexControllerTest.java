@@ -4,10 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,8 +59,8 @@ public class IndexControllerTest {
 		Room room2 = new Room();
 		room2.setId(2);
 
-		Set<Room> allRooms = new HashSet<>(Arrays.asList(room1, room2));
-		Set<Room> simpleUserRooms = new HashSet<>(Arrays.asList(room1));
+		List<Room> allRooms = Arrays.asList(room1, room2);
+		List<Room> simpleUserRooms = Arrays.asList(room1);
 		
 		when(roomService.findAll()).thenReturn(allRooms);
 		when(roomService.findByUser(simpleUser.getId())).thenReturn(simpleUserRooms);

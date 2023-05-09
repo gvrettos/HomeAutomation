@@ -8,10 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +49,7 @@ public class RoomControllerTest {
 
 	private static final String VIEW_ROOM_LIST = "room/list";
 
-	private Set<Room> allRooms;
+	private List<Room> allRooms;
 	
 	@Before
     public void setUp() {
@@ -61,7 +58,7 @@ public class RoomControllerTest {
 		Room room2 = new Room();
 		room2.setId(2);
 		
-		allRooms = new HashSet<>(Arrays.asList(room1, room2));
+		allRooms = Arrays.asList(room1, room2);
 		
 		when(roomService.findAll()).thenReturn(allRooms);
 		when(roomService.findById(1)).thenReturn(room1);
