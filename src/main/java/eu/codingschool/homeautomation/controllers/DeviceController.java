@@ -1,8 +1,6 @@
 package eu.codingschool.homeautomation.controllers;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -81,7 +79,7 @@ public class DeviceController {
 
 		model.addAttribute("device", new Device());
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
-		Set<Room> allRooms = roomService.findAll();
+		List<Room> allRooms = roomService.findAll();
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
 		model.addAttribute("actionUrl", ENDPOINT_ADMIN_DEVICES_BASE_URL);
@@ -107,7 +105,7 @@ public class DeviceController {
 
 		Device device = deviceService.findById(id);
 		List<DeviceType> allDeviceTypes = deviceTypeService.findAll();
-		Set<Room> allRooms = roomService.findAll();
+		List<Room> allRooms = roomService.findAll();
 		model.addAttribute("allDeviceTypes", allDeviceTypes);
 		model.addAttribute("allRooms", allRooms);
 		model.addAttribute("device", device);
@@ -307,11 +305,11 @@ public class DeviceController {
 
 		Set<Device> userDevices = personService.findByEmail(loggedInUserDetails.getUsername()).getDevices();
 		Optional<Integer> deviceIdFound = userDevices.stream()
-													 .map(device -> device.getId())
+													 .map(Device::getId)
 													 .filter(deviceIdStream -> deviceIdStream == deviceId)
 													 .findFirst();
 		if (!deviceIdFound.isPresent()) {
-			// trying to access a device that does not belong to the logged in user
+			// trying to access a device that does not belong to the logged-in user
 			throw new AccessDeniedException("");
 		}
 	}

@@ -3,7 +3,7 @@ package eu.codingschool.homeautomation.repositories;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Set;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class RoomRepositoryTest {
 	    entityManager.flush();
 	 
 	    // when
-	    Set<Room> roomsFound = roomRepository.findUserRooms(person.getId());
+	    List<Room> roomsFound = roomRepository.findUserRooms(person.getId());
 	 
 	    // then
 	    assertThat(roomsFound.size()).isGreaterThan(0);
@@ -57,7 +57,7 @@ public class RoomRepositoryTest {
 	    entityManager.flush();
 	 
 	    // when
-	    Set<Room> roomsFound = roomRepository.findUserRooms(person.getId());
+	    List<Room> roomsFound = roomRepository.findUserRooms(person.getId());
 	 
 	    // then
 	    assertTrue(roomsFound.isEmpty());

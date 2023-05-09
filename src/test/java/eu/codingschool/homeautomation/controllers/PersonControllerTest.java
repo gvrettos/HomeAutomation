@@ -76,7 +76,7 @@ public class PersonControllerTest {
 		room2.setId(2);
 		Room room3 = new Room();
 		room2.setId(3);
-		Set<Room> allRooms = new HashSet<>(Arrays.asList(room1, room2, room3));
+		List<Room> allRooms = Arrays.asList(room1, room2, room3);
 		
 		when(personService.findAll()).thenReturn(allPeople);
 		when(roomService.findAll()).thenReturn(allRooms);
