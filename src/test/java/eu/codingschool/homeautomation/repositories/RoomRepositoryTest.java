@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import eu.codingschool.homeautomation.repositories.projections.RoomDevicesCount;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class RoomRepositoryTest {
 	    entityManager.flush();
 	 
 	    // when
-	    List<Room> roomsFound = roomRepository.findUserRooms(person.getId());
+	    List<RoomDevicesCount> roomsFound = roomRepository.findUserRooms(person.getId());
 	 
 	    // then
 	    assertThat(roomsFound.size()).isGreaterThan(0);
@@ -57,7 +58,7 @@ public class RoomRepositoryTest {
 	    entityManager.flush();
 	 
 	    // when
-	    List<Room> roomsFound = roomRepository.findUserRooms(person.getId());
+	    List<RoomDevicesCount> roomsFound = roomRepository.findUserRooms(person.getId());
 	 
 	    // then
 	    assertTrue(roomsFound.isEmpty());

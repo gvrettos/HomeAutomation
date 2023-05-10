@@ -197,7 +197,7 @@ public class DeviceController {
 	@GetMapping(value = ENDPOINT_DEVICES_BASE_URL + "/user/{id}")
 	public String showUserDevices(@PathVariable(value="id") int userId, Model model) {
 		UserDetails loggedInUserDetails = getUserAuthorized(userId);
-		populateSideMenu(model, loggedInUserDetails);
+		populateSideMenuSimpleUser(model, loggedInUserDetails);
     	model.addAttribute("devices", deviceService.findByPersonsId(userId));
 		return VIEW_DEVICE_GRID;
 	}
@@ -229,7 +229,7 @@ public class DeviceController {
 			Model model) {
 
 		UserDetails loggedInUserDetails = getUserAuthorized(userId);
-		populateSideMenu(model, loggedInUserDetails);
+		populateSideMenuSimpleUser(model, loggedInUserDetails);
 		model.addAttribute("devices", deviceService.findByPersonsIdAndRoomId(userId, roomId));
 		model.addAttribute("selectedRoom", roomService.findById(roomId).getName());
 		return VIEW_DEVICE_GRID;
@@ -314,12 +314,10 @@ public class DeviceController {
 		}
 	}
 	
-	private void populateSideMenu(Model model, UserDetails loggedInUserDetails) {
+	private void populateSideMenuSimpleUser(Model model, UserDetails loggedInUserDetails) {
 		Person loggedInUser = personService.findByEmail(loggedInUserDetails.getUsername());
 		if (loggedInUser != null) {
-			model.addAttribute(
-					"rooms", 
-					loggedInUser.isAdmin() ? roomService.findAll() : roomService.findByUser(loggedInUser.getId()));
+			model.addAttribute("roomsDevicesCount", roomService.findByUser(loggedInUser.getId()));
 		}
 		model.addAttribute("loggedInUser", loggedInUser);
 	}

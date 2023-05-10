@@ -3,6 +3,7 @@ package eu.codingschool.homeautomation.services;
 import java.util.List;
 
 import eu.codingschool.homeautomation.model.Room;
+import eu.codingschool.homeautomation.repositories.projections.RoomDevicesCount;
 
 public interface RoomService {
 	
@@ -10,7 +11,7 @@ public interface RoomService {
 	
 	Room findById(Integer id);
 	
-	List<Room> findByUser(Integer personId);
+	List<RoomDevicesCount> findByUser(Integer personId);
     
     Room save(Room r);
     

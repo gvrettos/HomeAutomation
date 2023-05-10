@@ -2,6 +2,7 @@ package eu.codingschool.homeautomation.services;
 
 import java.util.List;
 
+import eu.codingschool.homeautomation.repositories.projections.RoomDevicesCount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 	
 	@Override
-	public List<Room> findByUser(Integer personId) {
+	public List<RoomDevicesCount> findByUser(Integer personId) {
 		return roomRepository.findUserRooms(personId);
 	}
 
