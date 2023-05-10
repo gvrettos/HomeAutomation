@@ -48,7 +48,7 @@ public class IndexController {
 					model.addAttribute("rooms", roomService.findAll());
 				}
 				else {
-					model.addAttribute("rooms", roomService.findByUser(loggedInUser.getId()));
+					model.addAttribute("roomsDevicesCount", roomService.findByUser(loggedInUser.getId()));
 				}
 			}
 			return VIEW_INDEX;

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
+import eu.codingschool.homeautomation.repositories.projections.RoomDevicesCount;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -108,7 +109,9 @@ public class DeviceControllerTest {
 		List<Room> allRooms = Arrays.asList(livingRoom, kitchen, bedroom);
 
 		List<Device> simpleUserAllDevices = Arrays.asList(device2, device3);
-		List<Room> simpleUserRooms = Arrays.asList(device2.getRoom());
+		List<RoomDevicesCount> simpleUserRooms = Arrays.asList(
+				new RoomDevicesCount(device2.getRoom(), (long)Math.random())
+		);
 		
 		when(deviceService.findAll()).thenReturn(allDevices);
 		when(deviceService.findByPersonsId(2)).thenReturn(simpleUserAllDevices);

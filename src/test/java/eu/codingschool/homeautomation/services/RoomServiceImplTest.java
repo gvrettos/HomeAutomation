@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import eu.codingschool.homeautomation.repositories.projections.RoomDevicesCount;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,8 +52,8 @@ public class RoomServiceImplTest {
 	private Room room1;
 	private Room room2;
 	
-	private List<Room> person1Rooms;
-	private List<Room> person2Rooms;
+	private List<RoomDevicesCount> person1Rooms;
+	private List<RoomDevicesCount> person2Rooms;
 
 	@Before
 	public void setUp() {
@@ -67,7 +68,10 @@ public class RoomServiceImplTest {
 		person2 = new Person();
 		person2.setId(2);
 		
-		person1Rooms = Arrays.asList(room1, room2);
+		person1Rooms = Arrays.asList(
+				new RoomDevicesCount(room1, (long)Math.random()),
+				new RoomDevicesCount(room2, (long)Math.random())
+		);
 		person2Rooms = Arrays.asList();
 		
 		Mockito.when(roomRepository.findById(room1.getId())).thenReturn(Optional.of(room1));
@@ -126,7 +130,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findUserRooms(person1.getId())).thenReturn(person1Rooms);
 		
 		// when
-		List<Room> rooms = roomService.findByUser(person1.getId());
+		List<RoomDevicesCount> rooms = roomService.findByUser(person1.getId());
 		
 		// then
 		assertNotNull(rooms);
@@ -139,7 +143,7 @@ public class RoomServiceImplTest {
 		Mockito.when(roomRepository.findUserRooms(person2.getId())).thenReturn(person2Rooms);
 		
 		// when
-		List<Room> room = roomService.findByUser(person2.getId());
+		List<RoomDevicesCount> room = roomService.findByUser(person2.getId());
 		
 		// then
 		assertThat(room).isEmpty();

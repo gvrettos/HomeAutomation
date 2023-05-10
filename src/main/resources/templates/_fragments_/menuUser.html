@@ -19,10 +19,10 @@
                 </a>
                 <div class="sidebar-submenu">
                     <ul>
-						<li th:each="room : ${rooms}" >
+						<li th:each="roomDevicesCount : ${roomsDevicesCount}" >
 							<a href="#" 
-							   th:href="@{/devices/user/{userId}/room/{roomId}(userId=${loggedInUser.getId()}, roomId=${room.getId()})}"
-							   th:text="${room.getName()}">
+							   th:href="@{/devices/user/{userId}/room/{roomId}(userId=${loggedInUser.getId()}, roomId=${roomDevicesCount.getRoom().getId()})}"
+                               th:text="|${roomDevicesCount.getRoom().getName()} (${roomDevicesCount.getUserDevicesCount()})|">
 							   Room
 							</a>
 						</li>

@@ -41,9 +41,10 @@
 				<div class="sidebar-submenu">
 					<ul>
 						<li th:each="room : ${rooms}">
-							<a href="#" 
+							<a href="#"
+							   th:if="${room.getDevices().size() != 0}"
 							   th:href="@{/admin/devices/user/all/room/{roomId}(roomId=${room.getId()})}"
-							   th:text="${room.getName()}"> 
+							   th:text="|${room.getName()} (${room.getDevices().size()})|">
 							   Room 
 							</a>
 						</li>
