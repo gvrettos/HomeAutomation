@@ -28,7 +28,7 @@ public class RoomRepositoryTest {
 	private RoomRepository roomRepository;
 	
 	@Test
-	public void findUserRooms_Should_ReturnRooms_When_UserHasAccessToAtLeastOneRoom() {
+	public void findUserRooms_shouldReturnRooms_whenUserHasAccessToAtLeastOneRoom() {
 	    // given
 		Room room = new Room();
 	    entityManager.persist(room);
@@ -51,7 +51,7 @@ public class RoomRepositoryTest {
 	}
 	
 	@Test
-	public void findUserRooms_Should_NotReturnRooms_When_UserHasNotAccessToAtLeastOneRoom() {
+	public void findUserRooms_shouldNotReturnRooms_whenUserHasNotAccessToAtLeastOneRoom() {
 	    // given
 	    Person person = new Person();
 	    entityManager.persist(person);

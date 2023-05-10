@@ -36,7 +36,7 @@ public class UserDetailsServiceImplTest {
 	private PersonService personService;
 	
 	@Test
-	public void loadUserByUsername_Should_LoadUser_When_UserExists() {
+	public void loadUserByUsername_shouldLoadUser_whenUserExists() {
 		// given
 		Person person = new Person("Admin", "Surname", "administrator@foo.com", "***", "ADMIN");
 		Mockito.when(personService.findByEmail(person.getEmail())).thenReturn(person);
@@ -54,7 +54,7 @@ public class UserDetailsServiceImplTest {
 	}
 	
 	@Test(expected = UsernameNotFoundException.class) // then
-	public void loadUserByUsername_Should_ThrowException_When_UserNotExists() {
+	public void loadUserByUsername_shouldThrowException_whenUserNotExists() {
 		// when 
 		userDetailsService.loadUserByUsername("mail@foo.com");
 	}

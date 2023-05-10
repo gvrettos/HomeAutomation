@@ -79,7 +79,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_ReturnRooms_When_RoomsExist() {
+	public void findAll_shouldReturnRooms_whenRoomsExist() {
 		// given
 		List<Room> roomsSaved = Arrays.asList(room1, room2);
 		Mockito.when(roomRepository.findAll()).thenReturn(roomsSaved);
@@ -93,7 +93,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_NotReturnRooms_When_RoomsNotExist() {
+	public void findAll_shouldNotReturnRooms_whenRoomsNotExist() {
 		// given
 		Mockito.when(roomRepository.findAll()).thenReturn(Arrays.asList());
 		
@@ -106,7 +106,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_ReturnRoom_When_RoomWithIdExists() {
+	public void findById_shouldReturnRoom_whenRoomWithIdExists() {
 		// when
 		Room room = roomService.findById(room1.getId());
 		
@@ -116,7 +116,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_NotReturnRoom_When_RoomWithIdNotExists() {
+	public void findById_shouldNotReturnRoom_whenRoomWithIdNotExists() {
 		// when
 		Room room = roomService.findById(3);
 		
@@ -125,7 +125,7 @@ public class RoomServiceImplTest {
 	}
 
 	@Test
-	public void findByUser_Should_ReturnRooms_When_RoomsForUserExists() {
+	public void findByUser_shouldReturnRooms_whenRoomsForUserExists() {
 		// given
 		Mockito.when(roomRepository.findUserRooms(person1.getId())).thenReturn(person1Rooms);
 		
@@ -138,7 +138,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void findByUser_Should_NotReturnRooms_When_RoomsForUserNotExists() {
+	public void findByUser_shouldNotReturnRooms_whenRoomsForUserNotExists() {
 		// given
 		Mockito.when(roomRepository.findUserRooms(person2.getId())).thenReturn(person2Rooms);
 		
@@ -150,7 +150,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void save_ShouldPersistRoom_When_Called() {
+	public void save_shouldPersistRoom_whenCalled() {
 		// given
 		Room roomToPersist = new Room();
 		roomToPersist.setName("Dining Room");
@@ -165,7 +165,7 @@ public class RoomServiceImplTest {
 	}
 	
 	@Test
-	public void delete_ShouldCallRepositoryDeleteOnce_When_Called() {
+	public void delete_shouldCallRepositoryDeleteOnce_whenCalled() {
 		// given
 		Room room = new Room();
 		

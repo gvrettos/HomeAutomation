@@ -71,7 +71,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_ReturnPersons_When_PersonsExist() {
+	public void findAll_shouldReturnPersons_whenPersonsExist() {
 		// given
 		List<Person> personsSaved = Arrays.asList(person1, person2);
 		Mockito.when(personRepository.findAll()).thenReturn(personsSaved);
@@ -85,7 +85,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_NotReturnPersons_When_PersonsNotExist() {
+	public void findAll_shouldNotReturnPersons_whenPersonsNotExist() {
 		// given
 		Mockito.when(personRepository.findAll()).thenReturn(Arrays.asList());
 		
@@ -98,7 +98,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_ReturnPerson_When_PersonWithIdExists() {
+	public void findById_shouldReturnPerson_whenPersonWithIdExists() {
 		// when
 		Person person = personService.findById(person1.getId());
 		
@@ -108,7 +108,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_NotReturnPerson_When_PersonWithIdNotExists() {
+	public void findById_shouldNotReturnPerson_whenPersonWithIdNotExists() {
 		// when
 		Person person = personService.findById(3);
 		
@@ -117,7 +117,7 @@ public class PersonServiceImplTest {
 	}
 
 	@Test
-	public void findByEmail_Should_ReturnPerson_When_PersonWithEmailExists() {
+	public void findByEmail_shouldReturnPerson_whenPersonWithEmailExists() {
 		// when
 		Person person = personService.findByEmail(PERSON1_EMAIL);
 		
@@ -127,7 +127,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void findByEmail_Should_NotReturnPerson_When_PersonWithEmailNotExists() {
+	public void findByEmail_shouldNotReturnPerson_whenPersonWithEmailNotExists() {
 		// when
 		Person person = personService.findByEmail("email@foo.com");
 		
@@ -136,7 +136,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void save_ShouldPersistUserWithSimpleUserRole_When_PasswordExists() {
+	public void save_shouldPersistUserWithSimpleUserRole_whenPasswordExists() {
 		// given
 		Person personToPersist = new Person();
 		personToPersist.setPassword("***");
@@ -151,7 +151,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void save_ShouldPersistUserWithoutRole_When_PasswordNotExists() {
+	public void save_shouldPersistUserWithoutRole_whenPasswordNotExists() {
 		// given
 		Person personToPersist = new Person();
 		Mockito.when(personRepository.save(personToPersist)).thenReturn(personToPersist);
@@ -165,7 +165,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void update_ShouldUpdatePersonDetails_When_PersonModelProvided() {
+	public void update_shouldUpdatePersonDetails_whenPersonModelProvided() {
 		// given
 		Person person = new Person();
 		person.setId(1);
@@ -183,7 +183,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void update_ShouldNotUpdatePersonDetails_When_PersonModelNotProvided() {
+	public void update_shouldNotUpdatePersonDetails_whenPersonModelNotProvided() {
 		// given
 		Person person = new Person();
 		person.setId(1);
@@ -201,7 +201,7 @@ public class PersonServiceImplTest {
 	}
 	
 	@Test
-	public void delete_ShouldCallRepositoryDeleteOnce_When_Called() {
+	public void delete_shouldCallRepositoryDeleteOnce_whenCalled() {
 		// given
 		Person person = new Person();
 		
@@ -214,13 +214,13 @@ public class PersonServiceImplTest {
 	
 	@Test
 	@WithMockUser // given
-	public void getLoggedInUser_ShouldExist_When_MockUserExists() {
+	public void getLoggedInUser_shouldExist_whenMockUserExists() {
 		// when - then
 		assertNotNull(personService.getLoggedInUser());
 	}
 	
 	@Test(expected = NullPointerException.class) // then
-	public void getLoggedInUser_ShouldThrowException_When_UserNotExists() {
+	public void getLoggedInUser_shouldThrowException_whenUserNotExists() {
 		// when
 		personService.getLoggedInUser();
 	}

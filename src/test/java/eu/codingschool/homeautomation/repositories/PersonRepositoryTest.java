@@ -23,7 +23,7 @@ public class PersonRepositoryTest {
 	private PersonRepository personRepository;
 	
 	@Test
-	public void findByEmail_Should_ReturnPerson_When_UserWithEmailExists() {
+	public void findByEmail_shouldReturnPerson_whenUserWithEmailExists() {
 	    // given
 	    Person personGiven = new Person("AdminName", "AdminSurname", "admin@foo.com", "***", "ADMIN");
 	    entityManager.persist(personGiven);
@@ -37,7 +37,7 @@ public class PersonRepositoryTest {
 	}
 	
 	@Test
-	public void findByEmail_Should_NotReturnPerson_When_UserWithEmailNotExists() {
+	public void findByEmail_shouldNotReturnPerson_whenUserWithEmailNotExists() {
 	    // given
 	    Person personGiven = new Person("AdminName", "AdminSurname", "adminSurname@foo.com", "***", "ADMIN");
 	    entityManager.persist(personGiven);

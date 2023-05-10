@@ -57,7 +57,7 @@ public class DeviceTypeServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_ReturnDeviceTypes_When_DeviceTypesExist() {
+	public void findAll_shouldReturnDeviceTypes_whenDeviceTypesExist() {
 		// given
 		List<DeviceType> deviceTypesSaved = Arrays.asList(deviceType1, deviceType2);
 		Mockito.when(deviceTypeRepository.findAll()).thenReturn(deviceTypesSaved);
@@ -71,7 +71,7 @@ public class DeviceTypeServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_NotReturnDeviceTypes_When_DeviceTypesNotExist() {
+	public void findAll_shouldNotReturnDeviceTypes_whenDeviceTypesNotExist() {
 		// given
 		Mockito.when(deviceTypeRepository.findAll()).thenReturn(Arrays.asList());
 		
@@ -84,7 +84,7 @@ public class DeviceTypeServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_ReturnDeviceType_When_DeviceTypeWithIdExists() {
+	public void findById_shouldReturnDeviceType_whenDeviceTypeWithIdExists() {
 		// given
 		Mockito.when(deviceTypeRepository.findById(deviceType1.getId())).thenReturn(Optional.of(deviceType1));
 		Mockito.when(deviceTypeRepository.findById(deviceType2.getId())).thenReturn(Optional.of(deviceType2));
@@ -98,7 +98,7 @@ public class DeviceTypeServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_NotReturnDeviceType_When_DeviceTypeWithIdNotExists() {
+	public void findById_shouldNotReturnDeviceType_whenDeviceTypeWithIdNotExists() {
 		// when
 		DeviceType deviceType = deviceTypeService.findById(3);
 		
@@ -107,7 +107,7 @@ public class DeviceTypeServiceImplTest {
 	}
 	
 	@Test
-	public void save_ShouldPersistDeviceType_When_Called() {
+	public void save_shouldPersistDeviceType_whenCalled() {
 		// given
 		DeviceType deviceTypeToPersist = new DeviceType();
 		deviceTypeToPersist.setMaxValue(100);
@@ -122,7 +122,7 @@ public class DeviceTypeServiceImplTest {
 	}
 	
 	@Test
-	public void delete_ShouldCallRepositoryDeleteOnce_When_Called() {
+	public void delete_shouldCallRepositoryDeleteOnce_whenCalled() {
 		// given
 		DeviceType deviceType = new DeviceType();
 		

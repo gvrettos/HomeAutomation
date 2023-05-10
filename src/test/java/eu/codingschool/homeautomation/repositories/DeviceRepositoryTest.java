@@ -27,7 +27,7 @@ public class DeviceRepositoryTest {
 	private DeviceRepository deviceRepository;
 	
 	@Test
-	public void findByRoomId_Should_ReturnDevices_When_DevicesForRoomExist() {
+	public void findByRoomId_shouldReturnDevices_whenDevicesForRoomExist() {
 	    // given
 		Person person = new Person();
 		Room room = new Room();
@@ -41,7 +41,7 @@ public class DeviceRepositoryTest {
 	}
 	
 	@Test
-	public void findByRoomId_Should_NotReturnDevices_When_DevicesForRoomNotExist() {
+	public void findByRoomId_shouldNotReturnDevices_whenDevicesForRoomNotExist() {
 	    // given
 		Room room = new Room();
 		persistRoom(room);
@@ -55,7 +55,7 @@ public class DeviceRepositoryTest {
 	}
 	
 	@Test
-	public void findByPersonsId_Should_ReturnDevices_When_DevicesForPersonExist() {
+	public void findByPersonsId_shouldReturnDevices_whenDevicesForPersonExist() {
 	    // given
 		Person person = new Person();
 		Room room = new Room();
@@ -69,7 +69,7 @@ public class DeviceRepositoryTest {
 	}
 	
 	@Test
-	public void findByPersonsId_Should_NotReturnDevices_When_DevicesForPersonNotExist() {
+	public void findByPersonsId_shouldNotReturnDevices_whenDevicesForPersonNotExist() {
 	    // given
 		Person person = new Person();
 		entityManager.persist(person);
@@ -83,7 +83,7 @@ public class DeviceRepositoryTest {
 	}
 	
 	@Test
-	public void findByPersonsIdAndRoomId_Should_ReturnDevices_When_DevicesForPersonAndRoomExist() {
+	public void findByPersonsIdAndRoomId_shouldReturnDevices_whenDevicesForPersonAndRoomExist() {
 	    // given
 		Person person = new Person();
 		Room room = new Room();
@@ -97,7 +97,7 @@ public class DeviceRepositoryTest {
 	}
 	
 	@Test
-	public void findByPersonsIdAndRoomId_Should_NotReturnDevices_When_DevicesForPersonAndRoomNotExist() {
+	public void findByPersonsIdAndRoomId_shouldNotReturnDevices_whenDevicesForPersonAndRoomNotExist() {
 	    // given
 		Person person = new Person();
 		Room room = new Room();

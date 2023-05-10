@@ -97,7 +97,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_ReturnDevices_When_DevicesExist() {
+	public void findAll_shouldReturnDevices_whenDevicesExist() {
 		// given
 		List<Device> devicesSaved = Arrays.asList(device1, device2);
 		Mockito.when(deviceRepository.findAll()).thenReturn(devicesSaved);
@@ -111,7 +111,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findAll_Should_NotReturnDevices_When_DevicesNotExist() {
+	public void findAll_shouldNotReturnDevices_whenDevicesNotExist() {
 		// given
 		Mockito.when(deviceRepository.findAll()).thenReturn(Arrays.asList());
 		
@@ -124,7 +124,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_ReturnDevice_When_DeviceWithIdExists() {
+	public void findById_shouldReturnDevice_whenDeviceWithIdExists() {
 		// when
 		Device device = deviceService.findById(device1.getId());
 		
@@ -134,7 +134,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findById_Should_NotReturnDevice_When_DeviceWithIdNotExists() {
+	public void findById_shouldNotReturnDevice_whenDeviceWithIdNotExists() {
 		// when
 		Device device = deviceService.findById(4);
 		
@@ -143,7 +143,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findAllByRoomId_Should_ReturnDevicesForRoom_When_DevicesForRoomExist() {
+	public void findAllByRoomId_shouldReturnDevicesForRoom_whenDevicesForRoomExist() {
 		// given
 		Mockito.when(deviceRepository.findByRoomId(room1.getId())).thenReturn(room1Devices);
 		
@@ -156,7 +156,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findAllByRoomId_Should_NotReturnDevicesForRoom_When_DevicesForRoomNotExist() {
+	public void findAllByRoomId_shouldNotReturnDevicesForRoom_whenDevicesForRoomNotExist() {
 		// given
 		Mockito.when(deviceRepository.findByRoomId(room2.getId())).thenReturn(room2Devices);
 		
@@ -169,7 +169,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findByPersonsId_Should_ReturnDevicesForPerson_When_DevicesForPersonExist() {
+	public void findByPersonsId_shouldReturnDevicesForPerson_whenDevicesForPersonExist() {
 		// given
 		Mockito.when(deviceRepository.findByPersonsId(person2.getId())).thenReturn(person2Devices);
 		
@@ -182,7 +182,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findByPersonsId_Should_NotReturnDevicesForPerson_When_DevicesForPersonNotExist() {
+	public void findByPersonsId_shouldNotReturnDevicesForPerson_whenDevicesForPersonNotExist() {
 		// given
 		Mockito.when(deviceRepository.findByPersonsId(person1.getId())).thenReturn(person1Devices);
 		
@@ -195,7 +195,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findByPersonsIdAndRoomId_Should_ReturnDevicesForPersonAndRoom_When_DevicesForPersonAndRoomExist() {
+	public void findByPersonsIdAndRoomId_shouldReturnDevicesForPersonAndRoom_whenDevicesForPersonAndRoomExist() {
 		// given
 		List<Device> person2Room1Devices = person2Devices
 				.stream()
@@ -214,7 +214,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void findByPersonsIdAndRoomId_Should_NotReturnDevicesForPersonAndRoom_When_DevicesForPersonAndRoomNotExist() {
+	public void findByPersonsIdAndRoomId_shouldNotReturnDevicesForPersonAndRoom_whenDevicesForPersonAndRoomNotExist() {
 		// given
 		List<Device> person1Room1Devices = person1Devices
 				.stream()
@@ -233,7 +233,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void getSelectedDevices_Should_ReturnDevices_When_DevicesHaveBeenSelectedAndExist() {
+	public void getSelectedDevices_shouldReturnDevices_whenDevicesHaveBeenSelectedAndExist() {
 		// given
 		List<String> selectedDeviceIds = Arrays.asList("1", "3", "4"); // "4" does not exist
 		
@@ -246,7 +246,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void getSelectedDevices_Should_NotReturnDevices_When_DevicesNotSelected() {
+	public void getSelectedDevices_shouldNotReturnDevices_whenDevicesNotSelected() {
 		// given
 		List<String> selectedDeviceIds = Arrays.asList();
 		
@@ -259,7 +259,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void getSelectedDevices_Should_NotReturnDevices_When_DevicesSelectedButNotExist() {
+	public void getSelectedDevices_shouldNotReturnDevices_whenDevicesSelectedButNotExist() {
 		// given
 		List<String> selectedDeviceIds = Arrays.asList("6", "5", "4"); // none of "6", "5", "4" exists
 		
@@ -272,7 +272,7 @@ public class DeviceServiceImplTest {
 	}	
 	
 	@Test
-	public void save_ShouldPersistDevice_When_Called() {
+	public void save_shouldPersistDevice_whenCalled() {
 		// given
 		Device deviceToPersist = new Device();
 		deviceToPersist.setName("air condition");
@@ -287,7 +287,7 @@ public class DeviceServiceImplTest {
 	}
 	
 	@Test
-	public void delete_ShouldCallRepositoryDeleteOnce_When_Called() {
+	public void delete_shouldCallRepositoryDeleteOnce_whenCalled() {
 		// given
 		Device device = new Device();
 		
