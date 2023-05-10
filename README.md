@@ -36,6 +36,9 @@ Admin can control any device in any manner:
 * MySQL (5.7.21 was used) 
 * Maven (3.5.3 was used)
 
+# Database setup
+Use scripts under `various_resources/database/scripts` (schema + initial data).
+
 # Build and Test the application
 1. Open `application.properties` and verify that any placeholders are substituted with actual values
 2. Open any terminal or command line prompt
@@ -86,3 +89,13 @@ IntelliJ IDEA.
 ## Code references
 * http://www.mkyong.com/spring-mvc/spring-mvc-form-handling-example/
 * http://www.mkyong.com/spring-boot/spring-boot-spring-security-thymeleaf-example/
+
+# Future Work
+- Containerize the app and the database
+  - This will make it easier for someone to deploy it and check it in action.
+- Substitute Thymeleaf with a modern UI framework (e.g. Angular)
+  - This will strip any UI code from the codebase and a new repo will be created for the UI part.
+- Update Spring Boot and JUnit to their latest versions
+  - First upgrade to the latest version of Spring Boot 2 and JUnit and then bump to later versions to make the transition smoother.
+
+Note: First fork the repo to a new repo and then apply any of the improvements above. Current repo will be tagged as v1.0 and it will be considered "frozen" for additional features.
